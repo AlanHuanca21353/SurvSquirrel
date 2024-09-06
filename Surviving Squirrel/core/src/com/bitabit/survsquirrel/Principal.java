@@ -1,11 +1,8 @@
 package com.bitabit.survsquirrel;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.bitabit.survsquirrel.screens.GameScreen;
 import com.bitabit.survsquirrel.screens.MainMenuScreen;
 
 public class Principal extends Game {

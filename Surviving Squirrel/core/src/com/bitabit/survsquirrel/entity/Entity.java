@@ -1,12 +1,8 @@
 package com.bitabit.survsquirrel.entity;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.bitabit.survsquirrel.enums.AnimationState;
-import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
 
 public abstract class Entity {

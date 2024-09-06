@@ -1,9 +1,7 @@
 package com.bitabit.survsquirrel.entity.attack;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.bitabit.survsquirrel.entity.Entity;
 import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;

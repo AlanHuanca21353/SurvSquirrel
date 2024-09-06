@@ -3,7 +3,6 @@ package com.bitabit.survsquirrel.entity.enemy;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.bitabit.survsquirrel.entity.Entity;
 import com.bitabit.survsquirrel.entity.EntityType;
-import com.bitabit.survsquirrel.entity.attack.Bullet;
 import com.bitabit.survsquirrel.enums.AnimationState;
 import com.bitabit.survsquirrel.screens.GameScreen;
 
