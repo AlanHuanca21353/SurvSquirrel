@@ -2,6 +2,8 @@ package com.bitabit.survsquirrel.screens;
 
 import java.util.ArrayList;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -49,7 +51,9 @@ public class GameScreen implements Screen{
 	
 	float shootDelayTimer, chargeTimer, power;
 	
-	boolean charging = false;
+	boolean charging = false, mapChange = true;
+
+	TiledMapTileLayer collisionLayer;
 	
 	public GameScreen(final Principal game) {
 		batch = new SpriteBatch();
@@ -108,11 +112,20 @@ public class GameScreen implements Screen{
 		
 		player = new Player(40, 700, this);
 		enemies.add(new EnemyRat(60, 700, this));
+		
+		collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
+		
 	}
 
 	@Override
 	public void render(float delta) {
 		// TODO Auto-generated method stub
+		
+		if (mapChange) {
+			collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
+			collisionLayer.setVisible(false);
+			mapChange = false;
+		}
 		
 		shootDelayTimer += delta;
 		
@@ -127,8 +140,13 @@ public class GameScreen implements Screen{
 		gameMap.update(Gdx.graphics.getDeltaTime());
         gameMap.render(cam, game.batch);
         
+        if (inputManager.isKeyReleased(Input.Keys.V)) {
+        	collisionLayer.setVisible(!collisionLayer.isVisible());
+        }
+        
         if (inputManager.isKeyReleased(Input.Keys.NUM_1)) {
         	gameMap = new TiledGameMap("map.tmx");
+        	mapChange = true;
         	player.setPos(40, 700);
         	
         	for (Enemy e : enemies) {
@@ -147,6 +165,7 @@ public class GameScreen implements Screen{
         
         if (inputManager.isKeyReleased(Input.Keys.NUM_3)) {
         	gameMap = new TiledGameMap("3.tmx");
+        	mapChange = true;
         	player.setPos(40, 700);
         	
         	for (Enemy e : enemies) {
