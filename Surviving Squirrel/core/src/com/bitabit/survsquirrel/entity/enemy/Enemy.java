@@ -11,6 +11,10 @@ public abstract class Enemy extends Entity {
 	protected AnimationState animState;
 	
 	protected float hp;
+	
+	protected int bigOuchLimit;
+	
+	protected boolean bigOuch = false;
 
 	public Enemy(float x, float y, EntityType type, GameScreen gameScreen) {
 		super(x, y, type, gameScreen);
@@ -24,6 +28,9 @@ public abstract class Enemy extends Entity {
 	}
 	
 	public void ouch(float damage) {
+		if (damage > bigOuchLimit) {
+			bigOuch = true;
+		}
 		hp -= damage;
 		System.out.println(hp);
 	}

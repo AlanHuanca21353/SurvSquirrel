@@ -9,12 +9,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector3;
 import com.bitabit.survsquirrel.InputManager;
 import com.bitabit.survsquirrel.Principal;
+import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.entity.Player;
 import com.bitabit.survsquirrel.entity.attack.Bullet;
 import com.bitabit.survsquirrel.entity.enemy.Enemy;
@@ -53,7 +55,7 @@ public class GameScreen implements Screen{
 	
 	boolean charging = false, mapChange = true;
 
-	TiledMapTileLayer collisionLayer;
+	TiledMapTileLayer collisionLayer, entitiesLayer;
 	
 	public GameScreen(final Principal game) {
 		batch = new SpriteBatch();
@@ -110,11 +112,11 @@ public class GameScreen implements Screen{
 		
 		gameMap = new TiledGameMap("map.tmx");
 		
-		player = new Player(40, 700, this);
-		enemies.add(new EnemyRat(60, 700, this));
-		
 		collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
+		entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
 		
+		entitySpawner(getWidth(), getHeight(), entitiesLayer, this);
+
 	}
 
 	@Override
@@ -123,7 +125,13 @@ public class GameScreen implements Screen{
 		
 		if (mapChange) {
 			collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
+			entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
+			
+			entitySpawner(getWidth(), getHeight(), entitiesLayer, this);
+			
 			collisionLayer.setVisible(false);
+			entitiesLayer.setVisible(false);
+			
 			mapChange = false;
 		}
 		
@@ -144,10 +152,23 @@ public class GameScreen implements Screen{
         	collisionLayer.setVisible(!collisionLayer.isVisible());
         }
         
+        if (inputManager.isKeyReleased(Input.Keys.E)) {
+        	entitiesLayer.setVisible(!entitiesLayer.isVisible());
+        }
+        
+        if (inputManager.isKeyReleased(Input.Keys.NUM_0)) {
+        	for (Enemy e : enemies) {
+    			e.remove = true;
+    			
+    			if (e.gotRemoved()) {
+    				enemiesToRemove.add(e);
+    			}
+    			
+    		}
+        }
+        
         if (inputManager.isKeyReleased(Input.Keys.NUM_1)) {
         	gameMap = new TiledGameMap("map.tmx");
-        	mapChange = true;
-        	player.setPos(40, 700);
         	
         	for (Enemy e : enemies) {
     			e.remove = true;
@@ -157,16 +178,15 @@ public class GameScreen implements Screen{
     			}
     			
     		}
+        	
         	enemies.removeAll(enemiesToRemove);
         	
-        	enemies.add(new EnemyRat(60, 700, this));
+        	mapChange = true;
         	
         }
         
         if (inputManager.isKeyReleased(Input.Keys.NUM_3)) {
         	gameMap = new TiledGameMap("3.tmx");
-        	mapChange = true;
-        	player.setPos(40, 700);
         	
         	for (Enemy e : enemies) {
     			e.remove = true;
@@ -177,6 +197,8 @@ public class GameScreen implements Screen{
     			
     		}
         	enemies.removeAll(enemiesToRemove);
+        	
+        	mapChange = true;
         	
         }
         
@@ -392,6 +414,46 @@ public class GameScreen implements Screen{
 	
 	public int getPixelHeight() {
 		return this.getHeight() * TileType.TILE_SIZE;
+	}
+	
+	public void entitySpawner(int mapWidth, int mapHeight, TiledMapTileLayer layer, GameScreen gameScreen) {
+		
+		boolean hasPlayerSpawned = false;
+		
+		for (int row = 0; row < mapWidth; row++) {
+			for (int col = 0; col < mapHeight; col++) {
+				Cell cell = layer.getCell(row, col);
+				
+				if (cell != null) {
+					
+					MapProperties props = cell.getTile().getProperties();
+					
+					if (props.containsKey("spawner")) {
+						
+						if (props.get("spawner", String.class).equals("player") && !hasPlayerSpawned) {
+							
+							player = new Player(row * TileType.TILE_SIZE, col * TileType.TILE_SIZE, gameScreen);
+							
+							hasPlayerSpawned = true;
+							
+						}
+						
+						if (props.get("spawner", String.class).equals("rat")) {
+						
+							enemies.add(new EnemyRat(row * TileType.TILE_SIZE, col * TileType.TILE_SIZE, gameScreen));
+							
+						}
+						
+					}
+					
+				}
+			}
+		}
+		
+		if (!hasPlayerSpawned) {
+			player = new Player(40, 800, gameScreen);
+		}
+		
 	}
 
 }
