@@ -32,7 +32,7 @@ public class Player extends Entity {
 	
 	float animTime, shootTimer, shootDelayTimer;
 	
-	public Sound jumpSound;
+	public Sound jumpSound, slingShotSound;
 	Sound walkSound;
 	
 	private boolean movingRight, movingLeft, moving, jumping, chargingShot, shooting, dontWalk, dontJump;
@@ -63,6 +63,7 @@ public class Player extends Entity {
 		
 		jumpSound = Gdx.audio.newSound(Gdx.files.internal("Sound/jump.wav"));
 		walkSound = Gdx.audio.newSound(Gdx.files.internal("Sound/walkSound.wav"));
+		slingShotSound = Gdx.audio.newSound(Gdx.files.internal("Sound/slingshot.wav"));
 		
 		movingLeft = false;
 		movingRight = false;
@@ -128,6 +129,7 @@ public class Player extends Entity {
 				long id = jumpSound.play(1.0f);
 				jumpSound.setLooping(id, false);
 				jumpSound.setVolume(id, 0.5f);
+				jumpSound.setPitch(id, rg.genRandomFloat(0.9f, 1.1f));
 				this.animState = AnimationState.JUMPING;
 			}
 		}

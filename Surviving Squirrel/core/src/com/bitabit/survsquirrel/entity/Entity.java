@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.bitabit.survsquirrel.screens.GameScreen;
+import com.bitabit.survsquirrel.tools.RandomGenerator;
 
 public abstract class Entity {
 	
@@ -14,11 +15,16 @@ public abstract class Entity {
 	protected boolean grounded = false;
 	public boolean hit = false;
 	public boolean remove = false;
+	
+	protected RandomGenerator rg;
 
 	public Entity(float x, float y, EntityType type, GameScreen gameScreen) {
 		this.pos = new Vector2(x,y);
 		this.type = type;
 		this.gameScreen = gameScreen;
+		
+		rg = gameScreen.rg;
+		
 	}
 	
 	public void update(float deltaTime, float gravity) {

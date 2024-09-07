@@ -11,11 +11,14 @@ import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.enums.AnimationState;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
+import com.bitabit.survsquirrel.tools.RandomGenerator;
 
 public class EnemyRat extends Enemy {
 	
 	private static final int SPEED = 90;
 	private static final int JUMP_VELOCITY = 4;
+	
+	RandomGenerator rg;
 	
 	InputManager inputManager;
 	
@@ -25,13 +28,14 @@ public class EnemyRat extends Enemy {
 	
 	Texture idleImage, hurtImage;
 	Sprite sprite;
-	Sound jumpSound;
-	Sound walkSound;
+	Sound jumpSound, walkSound;
 	
 	private boolean movingRight, movingLeft, jumping, dontWalk = false, dontJump = false;
 	
 	public EnemyRat(float x, float y, GameScreen gameScreen) {
 		super(x, y, EntityType.ENEMYRAT, gameScreen);
+		
+		rg = gameScreen.rg;
 		
 		idleImage = new Texture("imagenes/rat.png");
 		hurtImage = new Texture("imagenes/rat_ouch.png");
@@ -129,6 +133,7 @@ public class EnemyRat extends Enemy {
 			this.animState = AnimationState.HURT;
 			
 			if (ouchTimer >= 0.3f) {
+				
 				ouchTimer = 0f;
 				hit = false;
 				dontWalk = false;
@@ -176,6 +181,11 @@ public class EnemyRat extends Enemy {
 	public void die() {
 		// TODO Auto-generated method stub
 		System.out.println("RIP");
+		
+		long id = deathSound.play(1.0f);
+		deathSound.setLooping(id, false);
+		deathSound.setVolume(id, 0.25f);
+		
 		remove = true;
 	}
 

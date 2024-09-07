@@ -22,6 +22,7 @@ import com.bitabit.survsquirrel.entity.attack.Bullet;
 import com.bitabit.survsquirrel.entity.enemy.Enemy;
 import com.bitabit.survsquirrel.entity.enemy.EnemyRat;
 import com.bitabit.survsquirrel.enums.Direcciones;
+import com.bitabit.survsquirrel.tools.RandomGenerator;
 //import com.bitabit.survsquirrel.Rebotante;
 import com.bitabit.survsquirrel.world.TileType;
 import com.bitabit.survsquirrel.world.TiledGameMap;
@@ -32,7 +33,8 @@ public class GameScreen implements Screen{
 	private static final int MAP_LEFTBOUNDARY = 320;
 
 	OrthographicCamera cam;
-	
+
+	public RandomGenerator rg = new RandomGenerator();
 	
 	public SpriteBatch batch;
 	public InputManager inputManager;
@@ -220,7 +222,7 @@ public class GameScreen implements Screen{
 	        	else if (player.getDirX() == Direcciones.RIGHT){
 	        		bullets.add(new Bullet(player.getX()+player.getSpriteWidth(), player.getY()+20, this, Math.round(chargeTimer)));
 	        	}
-				long id = player.jumpSound.play(0.1f);
+				long id = player.slingShotSound.play(0.5f);
         	}
         	chargeTimer = 0f;
         	charging = false;

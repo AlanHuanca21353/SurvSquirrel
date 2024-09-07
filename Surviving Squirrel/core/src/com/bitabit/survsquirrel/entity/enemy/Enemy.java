@@ -1,10 +1,13 @@
 package com.bitabit.survsquirrel.entity.enemy;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.bitabit.survsquirrel.entity.Entity;
 import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.enums.AnimationState;
 import com.bitabit.survsquirrel.screens.GameScreen;
+import com.bitabit.survsquirrel.tools.RandomGenerator;
 
 public abstract class Enemy extends Entity {
 	
@@ -15,10 +18,15 @@ public abstract class Enemy extends Entity {
 	protected int bigOuchLimit;
 	
 	protected boolean bigOuch = false;
+	
+	Sound hurtSound, deathSound;
 
 	public Enemy(float x, float y, EntityType type, GameScreen gameScreen) {
 		super(x, y, type, gameScreen);
-		// TODO Auto-generated constructor stub
+		
+		hurtSound = Gdx.audio.newSound(Gdx.files.internal("Sound/hurtNoise.wav"));
+		deathSound = Gdx.audio.newSound(Gdx.files.internal("Sound/death.wav"));
+		
 	}
 
 	@Override
@@ -30,6 +38,12 @@ public abstract class Enemy extends Entity {
 	public void ouch(float damage) {
 		if (damage > bigOuchLimit) {
 			bigOuch = true;
+			
+			long id = hurtSound.play(1.0f);
+			hurtSound.setLooping(id, false);
+			hurtSound.setVolume(id, 0.3f);
+			hurtSound.setPitch(id, rg.genRandomFloat(0.75f, 1.25f));
+			
 		}
 		hp -= damage;
 		System.out.println(hp);
