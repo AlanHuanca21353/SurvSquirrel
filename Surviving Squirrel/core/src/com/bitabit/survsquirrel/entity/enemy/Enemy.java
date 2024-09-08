@@ -24,8 +24,8 @@ public abstract class Enemy extends Entity {
 	public Enemy(float x, float y, EntityType type, GameScreen gameScreen) {
 		super(x, y, type, gameScreen);
 		
-		hurtSound = Gdx.audio.newSound(Gdx.files.internal("Sound/hurtNoise.wav"));
-		deathSound = Gdx.audio.newSound(Gdx.files.internal("Sound/death.wav"));
+		hurtSound = audioM.createNewSound("Sound/hurtNoise.wav");
+		deathSound = audioM.createNewSound("Sound/death.wav");
 		
 	}
 
@@ -38,15 +38,15 @@ public abstract class Enemy extends Entity {
 	public void ouch(float damage) {
 		if (damage > bigOuchLimit) {
 			bigOuch = true;
-			
-			long id = hurtSound.play(1.0f);
-			hurtSound.setLooping(id, false);
-			hurtSound.setVolume(id, 0.3f);
-			hurtSound.setPitch(id, rg.genRandomFloat(0.75f, 1.25f));
-			
 		}
+		
+		audioM.playSound(hurtSound, 0.3f, 0.75f, 1.25f);
+		
 		hp -= damage;
 		System.out.println(hp);
+		
+		hit = true;
+		
 	}
 	
 	public float getHP() {

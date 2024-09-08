@@ -7,35 +7,47 @@ import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
 
 public class Bullet extends Attack {
-	
-	private static final int SPEED = 400;
-	private static Texture texture;
+
+	private static final int BASE_SPEED = 400;
+	private static Texture bImg;
 
 	private Direcciones dirX;
-	
-	public Bullet(float x, float y, GameScreen gameScreen, float power) {
-		super(x,y,EntityType.BULLET,gameScreen,power);
+
+	public Bullet(float x, float y, GameScreen gameScreen, float power, Direcciones dirX) {
+		super(x, y, EntityType.BULLET, gameScreen, power);
 		
-		if (texture == null) {
-			texture = new Texture("imagenes/bullet.png");
-		}
+		this.dirX = dirX;
 		
-		
+		bImg = new Texture("imagenes/bullet.png");
+
+
 	}
-	
+
 	public void update(float deltaTime, float gravity) {
 		this.velocityY += getWeight() * deltaTime;
+
+
+		switch (getDirX()) {
+		case RIGHT:
+			moveX(getSpeed() * deltaTime * (getPower()/2)+1);
+			break;
+
+		case LEFT:
+			moveX(-getSpeed() * deltaTime * (getPower()/2)-1);
+			break;
+		}
+
 		super.update(deltaTime, gravity);
 	}
 
 	@Override
 	public void render(SpriteBatch batch) {
-		batch.draw(texture, pos.x, pos.y);
-		
+		animM.drawStaticSprite(batch, bImg, this);
+
 	}
 
 	public int getSpeed() {
-		return SPEED;
+		return BASE_SPEED;
 	}
 
 	public Direcciones getDirX() {
@@ -45,5 +57,5 @@ public class Bullet extends Attack {
 	public void setDirX(Direcciones dirX) {
 		this.dirX = dirX;
 	}
-	
+
 }

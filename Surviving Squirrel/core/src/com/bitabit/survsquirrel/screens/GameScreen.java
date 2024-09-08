@@ -41,8 +41,9 @@ public class GameScreen implements Screen{
 	
 //	protected ArrayList<Entity> entities;
 	
-	Player player;
-	ArrayList<Enemy> enemies;
+	Player p, p2;
+	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	
 	ArrayList<Enemy> enemiesToRemove = new ArrayList<Enemy>();
 	ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
@@ -50,8 +51,6 @@ public class GameScreen implements Screen{
 	final Principal game;
 	
 	TiledGameMap gameMap;
-	
-	ArrayList<Bullet> bullets;
 	
 	float shootDelayTimer, chargeTimer, power;
 	
@@ -64,9 +63,6 @@ public class GameScreen implements Screen{
 		inputManager = new InputManager();
 	    Gdx.input.setInputProcessor(inputManager);
 		this.game = game;
-		bullets = new ArrayList<Bullet>();
-		enemies = new ArrayList<Enemy>();
-//		entities =  new ArrayList<Entity>();
 		
 		shootDelayTimer = 0f;
 		
@@ -78,14 +74,14 @@ public class GameScreen implements Screen{
 //			cam.update();
 //		}
 		
-		if (player.getX() + player.getLeftBoundary() < MAP_LEFTBOUNDARY) {
-			cam.position.set(MAP_LEFTBOUNDARY, player.getY()+20, 0);
+		if (p.getX() + p.getLeftBoundary() < MAP_LEFTBOUNDARY) {
+			cam.position.set(MAP_LEFTBOUNDARY, p.getY()+20, 0);
 		}
-		else if (player.getX() + player.getLeftBoundary() > getPixelWidth()-MAP_LEFTBOUNDARY){
-			cam.position.set(getPixelWidth()-MAP_LEFTBOUNDARY, player.getY()+20, 0);
+		else if (p.getX() + p.getLeftBoundary() > getPixelWidth()-MAP_LEFTBOUNDARY){
+			cam.position.set(getPixelWidth()-MAP_LEFTBOUNDARY, p.getY()+20, 0);
 		}
 		else {
-			cam.position.set(player.getX() + player.getLeftBoundary(), player.getY()+20, 0);
+			cam.position.set(p.getX() + p.getLeftBoundary(), p.getY()+20, 0);
 		}
 	}
 	
@@ -158,9 +154,9 @@ public class GameScreen implements Screen{
         	entitiesLayer.setVisible(!entitiesLayer.isVisible());
         }
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_0)) {
+        if (inputManager.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
         	for (Enemy e : enemies) {
-    			e.remove = true;
+    			e.ouch(9999f);
     			
     			if (e.gotRemoved()) {
     				enemiesToRemove.add(e);
@@ -169,7 +165,7 @@ public class GameScreen implements Screen{
     		}
         }
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_1)) {
+        if (inputManager.isKeyReleased(Input.Keys.NUM_1)) { // Mapa 1
         	gameMap = new TiledGameMap("map.tmx");
         	
         	for (Enemy e : enemies) {
@@ -187,7 +183,7 @@ public class GameScreen implements Screen{
         	
         }
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_3)) {
+        if (inputManager.isKeyReleased(Input.Keys.NUM_3)) { // Mapa 3
         	gameMap = new TiledGameMap("3.tmx");
         	
         	for (Enemy e : enemies) {
@@ -205,50 +201,41 @@ public class GameScreen implements Screen{
         }
         
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_2)) {
-        	enemies.add(new EnemyRat(player.getX()+70, player.getY()+100, this));
+        if (inputManager.isKeyReleased(Input.Keys.NUM_2)) { // Spawnear Rata
+        	enemies.add(new EnemyRat(p.getX()+70, p.getY()+100, this));
         }
 		
-        if (player.isChargingShot() && shootDelayTimer >= SHOOT_WAIT_TIME && !player.isMoving()) { // Cargar disparo
+        if (p.isChargingShot() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Cargar disparo
         	charging = true;
 		}
         
-        if (player.isShooting() && shootDelayTimer >= SHOOT_WAIT_TIME && !player.isMoving()) { // Disparar
+        if (p.isShooting() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Disparar
         	shootDelayTimer = 0f;
-        	if (player.isGrounded()) {
-	        	if (player.getDirX() == Direcciones.LEFT) {
-	        		bullets.add(new Bullet(player.getX(), player.getY()+20, this, Math.round(chargeTimer)));	
+        	if (p.isGrounded()) {
+	        	if (p.getDirX() == Direcciones.LEFT) {
+	        		bullets.add(new Bullet(p.getX(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));	
 	        	}
-	        	else if (player.getDirX() == Direcciones.RIGHT){
-	        		bullets.add(new Bullet(player.getX()+player.getSpriteWidth(), player.getY()+20, this, Math.round(chargeTimer)));
+	        	else if (p.getDirX() == Direcciones.RIGHT){
+	        		bullets.add(new Bullet(p.getX()+p.getSpriteWidth(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));
 	        	}
-				long id = player.slingShotSound.play(0.5f);
         	}
         	chargeTimer = 0f;
         	charging = false;
         }
         
         batch.begin();
-		
-//		for (Entity entity : entities) {
-//			entity.render(batch);
-//		}
         
         for (Bullet bullet : bullets) {
 			bullet.render(batch);
 		}
 		
-		player.render(cam, batch);
+		p.render(cam, batch);
 		
 		for (Enemy e : enemies) {
 			e.render(batch);
 		}
 		
-//		for (Entity entity : entities) {
-//			entity.update(delta, -9.8f);
-//		}
-		
-		player.update(delta, -9.8f);
+		p.update(delta, -9.8f);
 
 		for (Enemy e : enemies) {
 			e.update(delta, -9.8f);
@@ -262,14 +249,7 @@ public class GameScreen implements Screen{
 		for (Bullet bullet : bullets) {
 			
 			if (bullet.getDirX() == null) {
-				bullet.setDirX(player.getDirX());
-			}
-			
-			if (bullet.getDirX() == Direcciones.RIGHT) {
-				bullet.moveX(bullet.getSpeed() * delta * (bullet.getPower()/2)+1);
-			}
-			else if (bullet.getDirX() == Direcciones.LEFT) {
-				bullet.moveX(-bullet.getSpeed() * delta * (bullet.getPower()/2)-1);
+				bullet.setDirX(p.getDirX());
 			}
 			
 			bullet.update(delta, -9.8f);
@@ -281,7 +261,6 @@ public class GameScreen implements Screen{
 					e.ouch(bullet.getDmg());
 					
 					bullet.remove = true;
-					e.hit = true;
 				}
 			}
 			
@@ -434,7 +413,7 @@ public class GameScreen implements Screen{
 						
 						if (props.get("spawner", String.class).equals("player") && !hasPlayerSpawned) {
 							
-							player = new Player(row * TileType.TILE_SIZE, col * TileType.TILE_SIZE, gameScreen);
+							p = new Player(row * TileType.TILE_SIZE, col * TileType.TILE_SIZE, gameScreen);
 							
 							hasPlayerSpawned = true;
 							
@@ -453,7 +432,7 @@ public class GameScreen implements Screen{
 		}
 		
 		if (!hasPlayerSpawned) {
-			player = new Player(40, 800, gameScreen);
+			p = new Player(40, 800, gameScreen);
 		}
 		
 	}

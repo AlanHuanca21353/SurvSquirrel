@@ -22,10 +22,6 @@ public class EnemyRat extends Enemy {
 	
 	InputManager inputManager;
 	
-	private Direcciones dirX;
-	
-	float ouchTimer;
-	
 	Texture idleImage, hurtImage;
 	Sprite sprite;
 	Sound jumpSound, walkSound;
@@ -49,8 +45,8 @@ public class EnemyRat extends Enemy {
 		
 		ouchTimer = 0f;
 
-		jumpSound = Gdx.audio.newSound(Gdx.files.internal("Sound/jump.wav"));
-		walkSound = Gdx.audio.newSound(Gdx.files.internal("Sound/walkSound.wav"));
+		jumpSound = audioM.createNewSound("Sound/jump.wav");
+		walkSound = audioM.createNewSound("Sound/walkSound.wav");
 		
 		movingLeft = false;
 		movingRight = false;
@@ -76,10 +72,8 @@ public class EnemyRat extends Enemy {
 			
 			if (jumping) { // Salto inicial
 				this.velocityY += JUMP_VELOCITY * getWeight();
-				long id = jumpSound.play(1.0f);
-				jumpSound.setLooping(id, false);
-				jumpSound.setVolume(id, 0.5f);
-				jumpSound.setPitch(id, 0.75f);
+				
+				audioM.playSound(jumpSound, 0.5f, 0.65f, 0.85f);
 			}
 		}
 		else { // Si estás en el aire
@@ -152,17 +146,18 @@ public class EnemyRat extends Enemy {
 
 	@Override
 	public void render(SpriteBatch batch) {
-		boolean flip = (getDirX() == Direcciones.LEFT);
-		if (this.animState == AnimationState.IDLE) {
-			batch.draw(idleImage, flip ? pos.x + getSpriteWidth() : pos.x, pos.y, flip ? -getSpriteWidth() : getSpriteWidth(), getSpriteHeight());	
+//		boolean flip = (getDirX() == Direcciones.LEFT);
+		
+		switch (animState) {
+		case IDLE:
+			animM.drawStaticSprite(batch, idleImage, this);
+			break;
+			
+		case HURT:
+			animM.drawStaticSprite(batch, hurtImage, this);
+			break;
 		}
-		else if (this.animState == AnimationState.HURT) {
-			batch.draw(hurtImage, flip ? pos.x + getSpriteWidth() : pos.x, pos.y, flip ? -getSpriteWidth() : getSpriteWidth(), getSpriteHeight());	
-		}
-	}
-	
-	public Direcciones getDirX() {
-		return dirX;
+		
 	}
 
 	@Override
@@ -182,9 +177,7 @@ public class EnemyRat extends Enemy {
 		// TODO Auto-generated method stub
 		System.out.println("RIP");
 		
-		long id = deathSound.play(1.0f);
-		deathSound.setLooping(id, false);
-		deathSound.setVolume(id, 0.25f);
+		audioM.playSound(deathSound, 0.25f);
 		
 		remove = true;
 	}

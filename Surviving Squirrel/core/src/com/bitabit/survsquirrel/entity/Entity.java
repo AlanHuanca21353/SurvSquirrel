@@ -3,7 +3,10 @@ package com.bitabit.survsquirrel.entity;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
+import com.bitabit.survsquirrel.tools.AnimationManager;
+import com.bitabit.survsquirrel.tools.AudioManager;
 import com.bitabit.survsquirrel.tools.RandomGenerator;
 
 public abstract class Entity {
@@ -13,10 +16,20 @@ public abstract class Entity {
 	protected float velocityY = 0;
 	protected GameScreen gameScreen;
 	protected boolean grounded = false;
+
+	protected Direcciones dirX, dirY;
+	
 	public boolean hit = false;
 	public boolean remove = false;
 	
+	protected float ouchTimer;
+	
+	public AudioManager audioM = new AudioManager();
+	public AnimationManager animM = new AnimationManager();
+	
 	protected RandomGenerator rg;
+	
+	protected float animTime;
 
 	public Entity(float x, float y, EntityType type, GameScreen gameScreen) {
 		this.pos = new Vector2(x,y);
@@ -28,6 +41,9 @@ public abstract class Entity {
 	}
 	
 	public void update(float deltaTime, float gravity) {
+		
+		animTime += deltaTime;
+		
 		float newY = pos.y;
 		
 		this.velocityY += gravity * deltaTime * getWeight();
@@ -75,6 +91,10 @@ public abstract class Entity {
 		return rect1.overlaps(rect2);
 	}
 	
+	public Direcciones getDirX() {
+		return dirX;
+	}
+	
 	public float getX() {
 		return pos.x;
 	}
@@ -113,6 +133,10 @@ public abstract class Entity {
 	
 	public float getWeight() {
 		return type.getWeight();
+	}
+	
+	public float getAnimTime() {
+		return animTime;
 	}
 	
 	public boolean gotHit() {
