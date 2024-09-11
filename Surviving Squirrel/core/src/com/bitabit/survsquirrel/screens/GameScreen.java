@@ -27,6 +27,9 @@ import com.bitabit.survsquirrel.tools.RandomGenerator;
 import com.bitabit.survsquirrel.world.TileType;
 import com.bitabit.survsquirrel.world.TiledGameMap;
 
+/**
+ * 
+ */
 public class GameScreen implements Screen{
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
@@ -397,35 +400,38 @@ public class GameScreen implements Screen{
 		return this.getHeight() * TileType.TILE_SIZE;
 	}
 	
-	public void entitySpawner(int mapWidth, int mapHeight, TiledMapTileLayer layer, GameScreen gameScreen) {
+	
+	/** Spawnea todas las entidades cargadas en el mapa.
+	 * @param mapW - El ancho del Mapa
+	 * @param mapH - El alto del Mapa
+	 * @param eLayer - La capa donde se encuentran los spawns
+	 * @param gameScreen - La gameScreen (Usualmente se usa 'this')
+	 */
+	public void entitySpawner(int mapW, int mapH, TiledMapTileLayer eLayer, GameScreen gameScreen) {
 		
 		boolean hasPlayerSpawned = false;
 		
-		for (int row = 0; row < mapWidth; row++) {
-			for (int col = 0; col < mapHeight; col++) {
-				Cell cell = layer.getCell(row, col);
+		for (int row = 0; row < mapW; row++) {
+			int x = row * TileType.TILE_SIZE;
+			
+			for (int col = 0; col < mapH; col++) {
+				int y = col * TileType.TILE_SIZE;
+				
+				Cell cell = eLayer.getCell(row, col);
 				
 				if (cell != null) {
 					
-					MapProperties props = cell.getTile().getProperties();
-					
-					if (props.containsKey("spawner")) {
-						
-						if (props.get("spawner", String.class).equals("player") && !hasPlayerSpawned) {
-							
-							p = new Player(row * TileType.TILE_SIZE, col * TileType.TILE_SIZE, gameScreen);
-							
+					if (!hasPlayerSpawned) {
+						if (checkPropertyValue(cell, "spawner", "player")) {
+							p = new Player(x, y, gameScreen);
 							hasPlayerSpawned = true;
-							
 						}
-						
-						if (props.get("spawner", String.class).equals("rat")) {
-						
-							enemies.add(new EnemyRat(row * TileType.TILE_SIZE, col * TileType.TILE_SIZE, gameScreen));
-							
-						}
-						
 					}
+					
+					if (checkPropertyValue(cell, "spawner", "rat")) {
+						enemies.add(new EnemyRat(x, y, gameScreen));
+					}
+					
 					
 				}
 			}
@@ -435,6 +441,39 @@ public class GameScreen implements Screen{
 			p = new Player(40, 800, gameScreen);
 		}
 		
+	}
+	
+	/** Confirma si la celda tiene una propiedad con nombre 'name' y valor (String) 'value'
+	 * @param cell - La celda/tile a analizar.
+	 * @param name - El nombre de la propiedad a encontrar.
+	 * @param value - El valor que debe tener esa propiedad. ("hola", "pepe", etc...)
+	 * @return - Devuelve 'true' si encuentra lo que busca, 'false' si no lo encuentra.
+	 */
+	public boolean checkPropertyValue(Cell cell, String name, String value) {
+		MapProperties props = cell.getTile().getProperties();
+		return props.containsKey(name) && props.get(name, String.class).equals(value);
+	}
+	
+	/** Confirma si la celda tiene una propiedad con nombre 'name' y valor (Boolean) 'value'
+	 * @param cell - La celda/tile a analizar.
+	 * @param name - El nombre de la propiedad a encontrar.
+	 * @param value - El valor que debe tener esa propiedad. (true, false)
+	 * @return - Devuelve 'true' si encuentra lo que busca, 'false' si no lo encuentra.
+	 */
+	public boolean checkPropertyValue(Cell cell, String name, boolean value) {
+		MapProperties props = cell.getTile().getProperties();
+		return props.containsKey(name) && props.get(name, Boolean.class).equals(value);
+	}
+	
+	/** Confirma si la celda tiene una propiedad con nombre 'name' y valor (Integer) 'value'
+	 * @param cell - La celda/tile a analizar.
+	 * @param name - El nombre de la propiedad a encontrar.
+	 * @param value - El valor que debe tener esa propiedad. (1, 2, 13, 78, etc...)
+	 * @return - Devuelve 'true' si encuentra lo que busca, 'false' si no lo encuentra.
+	 */
+	public boolean checkPropertyValue(Cell cell, String name, int value) {
+		MapProperties props = cell.getTile().getProperties();
+		return props.containsKey(name) && props.get(name, Integer.class).equals(value);
 	}
 
 }
