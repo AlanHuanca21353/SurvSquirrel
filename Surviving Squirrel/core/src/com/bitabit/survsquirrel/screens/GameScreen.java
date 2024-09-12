@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -214,7 +215,7 @@ public class GameScreen implements Screen{
         
         if (p.isShooting() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Disparar
         	shootDelayTimer = 0f;
-        	if (p.isGrounded()) {
+        	if (p.isGrounded() && !p.isDead()) {
 	        	if (p.getDirX() == Direcciones.LEFT) {
 	        		bullets.add(new Bullet(p.getX(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));	
 	        	}
@@ -243,8 +244,32 @@ public class GameScreen implements Screen{
 		for (Enemy e : enemies) {
 			e.update(delta, -9.8f);
 			
-			if (e.gotRemoved()) {
-				enemiesToRemove.add(e);
+			if (e.checkDistanceTiles(p) < 5) {
+				System.out.println(e.checkDistanceTiles(p));
+			}
+			
+			if (e.isAwaken()) {
+				if (inputManager.isKeyPressed(Input.Keys.K)) {
+					if (e.getDirX() == Direcciones.LEFT) {
+		        		bullets.add(new Bullet(e.getX()+e.getLeftBoundary(), e.getY()+20, this, 2, e.getDirX(), true));	
+		        	}
+		        	else if (e.getDirX() == Direcciones.RIGHT){
+		        		bullets.add(new Bullet(e.getX()+e.getCollisionWidth(), e.getY()+20, this, 2, e.getDirX(), true));
+		        	}
+				}
+				
+				if (inputManager.isKeyPressed(Input.Keys.M)) {
+					System.out.println(e.checkDistance(p));
+				}
+				
+				if (e.gotRemoved()) {
+					enemiesToRemove.add(e);
+				}	
+			}
+			else {
+				if (e.checkDistanceTiles(p) <= 2) {
+					e.wakeUp();
+				}
 			}
 			
 		}
@@ -258,15 +283,27 @@ public class GameScreen implements Screen{
 			bullet.update(delta, -9.8f);
 			
 			for (Enemy e : enemies) {
-				if (bullet.collide(e)){
-					System.out.println("Ouch!");
+				
+				if (!bullet.hurtPlayer) {
+					if (bullet.collide(e)){
+						System.out.println("Ouch!");
+						
+						e.ouch(bullet.getDmg(), bullet.getDirX());
+						
+						bullet.remove = true;
+					}	
+				}
+			}
+			
+			if (bullet.hurtPlayer && !p.isDead()) {
+				if (bullet.collide(p)) {
+					System.out.println("Ardilla: Ouch!");
 					
-					e.ouch(bullet.getDmg());
+					p.ouch(5, bullet.getDirX());
 					
 					bullet.remove = true;
 				}
 			}
-			
 
 			if (bullet.isGrounded()) {
 				bullet.remove = true;
@@ -321,7 +358,7 @@ public class GameScreen implements Screen{
 	}
 	
 	public TileType getTileTypeByLocation(int layer, float x, float y) {
-		return this.getTileTypeByCoordinate(layer, (int) (x / TileType.TILE_SIZE), (int) (y / TileType.TILE_SIZE));
+		return getTileTypeByCoordinate(layer, (int) (x / TileType.TILE_SIZE), (int) (y / TileType.TILE_SIZE));
 	}
 
 	public TileType getTileTypeByCoordinate(int layer, int col, int row) {
@@ -361,22 +398,7 @@ public class GameScreen implements Screen{
 	}
 	
 	public boolean doesRectCollideWithMap(float x, float y, int width, int height, int leftBound) {
-		if (x+leftBound<0 || y<0 || x+leftBound+width > getPixelWidth() || y + height > getPixelHeight()) {
-			return true;
-		}
-		
-		for (int row = (int) (y / TileType.TILE_SIZE); row < Math.ceil((y+height)) / TileType.TILE_SIZE; row++) {
-			for (int col = (int) ((x+leftBound) / TileType.TILE_SIZE); col < Math.ceil((x+leftBound+width)) / TileType.TILE_SIZE; col++) {
-				for (int layer = 0; layer < getLayers(); layer++) {
-					TileType type = getTileTypeByCoordinate(layer, col, row);
-					if (type != null && type.isCollidable()) {
-						return true;
-					}
-				}
-			}
-		}
-		
-		return false;
+		return doesRectCollideWithMap(x+leftBound, y, width, height);
 		
 	}
 

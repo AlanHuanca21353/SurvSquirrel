@@ -3,7 +3,7 @@ package com.bitabit.survsquirrel.entity;
 public enum EntityType {
 	
 	PLAYER("player", 44, 40, 20, 20, 12, 100),
-	ENEMYRAT("rat", 40, 60, 20, 40, 10, 100),
+	ENEMYRAT("rat", 60, 70, 20, 40, 20, 100),
 	BULLET("bullet", 5, 5, 18);
 	
 	private String id;

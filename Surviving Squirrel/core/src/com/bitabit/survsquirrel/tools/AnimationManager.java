@@ -9,6 +9,30 @@ import com.bitabit.survsquirrel.enums.Direcciones;
 
 public class AnimationManager {
 	
+	/** Genera una Animación para una Entidad usando un Spritesheet de multiples filas.
+	 * @param fps - La velocidad en Frames por Segundo
+	 * @param img - La imagen base
+	 * @param ent - La entidad.
+	 * @param frameMax - La cantidad de frames en total
+	 * @param rowMax - La cantidad de filas en total
+	 * @param colMax - La cantidad de columnas en total
+	 * @return - Devuelve una Animación
+	 */
+	public Animation<TextureRegion> genEntAnimation(float fps, Texture img, Entity e, int frameMax, int rowMax, int colMax){
+		return genAnimation(fps, img, e.getSpriteWidth(), e.getSpriteHeight(), frameMax, rowMax, colMax);
+	}
+	
+	/** Genera una Animación para una Entidad usando un Spritesheet de una sola fila.
+	 * @param fps - La velocidad en Frames por Segundo
+	 * @param img - La imagen base
+	 * @param ent - La entidad.
+	 * @param frameMax - La cantidad de frames en total
+	 * @return - Devuelve una Animación
+	 */
+	public Animation<TextureRegion> genEntAnimation(float fps, Texture img, Entity e, int frameMax){
+		return genAnimation(fps, img, e.getSpriteWidth(), e.getSpriteHeight(), frameMax);
+	}
+	
 	/** Genera una Animación usando un Spritesheet de multiples filas.
 	 * @param fps - La velocidad en Frames por Segundo
 	 * @param img - La imagen base
@@ -38,9 +62,9 @@ public class AnimationManager {
 	 * @param colMax - La cantidad de columnas en total
 	 * @return - Devuelve una Animación
 	 */
-	public Animation<TextureRegion> genAnimation(float fps, Texture img, int tileWidth, int tileHeight, int frameMax, int colMax){
+	public Animation<TextureRegion> genAnimation(float fps, Texture img, int tileWidth, int tileHeight, int frameMax){
 		
-		TextureRegion[] animFrames = genAnimFrames(img, tileWidth, tileHeight, frameMax, colMax);
+		TextureRegion[] animFrames = genAnimFrames(img, tileWidth, tileHeight, frameMax);
 		
 		Animation<TextureRegion> anim = new Animation<TextureRegion>(1f/fps, animFrames);
 		
@@ -84,7 +108,7 @@ public class AnimationManager {
 	 * @param colMax - La cantidad de columnas en total
 	 * @return - Devuelve un TextureRegion
 	 */
-	public TextureRegion[] genAnimFrames(Texture img, int tileWidth, int tileHeight, int frameMax, int colMax) {
+	public TextureRegion[] genAnimFrames(Texture img, int tileWidth, int tileHeight, int frameMax) {
 
 		TextureRegion[] animFrames;
 		TextureRegion[][] tempFrames = TextureRegion.split(img, tileWidth, tileHeight);
@@ -92,8 +116,8 @@ public class AnimationManager {
 		animFrames = new TextureRegion[frameMax];
 		int index = 0;
 
-		for (int col = 0; col < colMax; col++) {
-			animFrames[index++] = tempFrames[0][col];
+		for (int frame = 0; frame < frameMax; frame++) {
+			animFrames[index++] = tempFrames[0][frame];
 		}
 
 		return animFrames;

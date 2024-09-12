@@ -12,6 +12,8 @@ public class Bullet extends Attack {
 	private static Texture bImg;
 
 	private Direcciones dirX;
+	
+	public boolean hurtPlayer = false;
 
 	public Bullet(float x, float y, GameScreen gameScreen, float power, Direcciones dirX) {
 		super(x, y, EntityType.BULLET, gameScreen, power);
@@ -21,6 +23,13 @@ public class Bullet extends Attack {
 		bImg = new Texture("imagenes/bullet.png");
 
 
+	}
+	
+	public Bullet(float x, float y, GameScreen gameScreen, float power, Direcciones dirX, boolean hurtPlayer) {
+		this(x,y,gameScreen,power,dirX);
+
+		this.hurtPlayer = hurtPlayer;
+		
 	}
 
 	public void update(float deltaTime, float gravity) {
