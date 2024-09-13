@@ -229,7 +229,6 @@ public class EnemyRat extends Enemy {
 
 	@Override
 	public void sleep() {
-		System.out.println("I'm sleeping");
 		newAnimState = AnimationState.SLEEPING;
 	}
 

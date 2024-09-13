@@ -244,9 +244,9 @@ public class GameScreen implements Screen{
 		for (Enemy e : enemies) {
 			e.update(delta, -9.8f);
 			
-			if (e.checkDistanceTiles(p) < 5) {
-				System.out.println(e.checkDistanceTiles(p));
-			}
+//			if (e.checkDistanceTiles(p) < 5) {
+//				System.out.println(e.checkDistanceTiles(p));
+//			}
 			
 			if (e.isAwaken()) {
 				if (inputManager.isKeyPressed(Input.Keys.K)) {
@@ -286,7 +286,7 @@ public class GameScreen implements Screen{
 				
 				if (!bullet.hurtPlayer) {
 					if (bullet.collide(e)){
-						System.out.println("Ouch!");
+//						System.out.println("Ouch!");
 						
 						e.ouch(bullet.getDmg(), bullet.getDirX());
 						
@@ -297,7 +297,7 @@ public class GameScreen implements Screen{
 			
 			if (bullet.hurtPlayer && !p.isDead()) {
 				if (bullet.collide(p)) {
-					System.out.println("Ardilla: Ouch!");
+//					System.out.println("Ardilla: Ouch!");
 					
 					p.ouch(5, bullet.getDirX());
 					
