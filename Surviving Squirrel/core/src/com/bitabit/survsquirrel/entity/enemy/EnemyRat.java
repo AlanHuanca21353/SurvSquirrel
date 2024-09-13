@@ -194,7 +194,6 @@ public class EnemyRat extends Enemy {
 
 	@Override
 	public void render(SpriteBatch batch) {
-		//		boolean flip = (getDirX() == Direcciones.LEFT);
 
 		switch (animState) {
 		case IDLE:
@@ -229,7 +228,6 @@ public class EnemyRat extends Enemy {
 
 	@Override
 	public void sleep() {
-		System.out.println("I'm sleeping");
 		newAnimState = AnimationState.SLEEPING;
 	}
 

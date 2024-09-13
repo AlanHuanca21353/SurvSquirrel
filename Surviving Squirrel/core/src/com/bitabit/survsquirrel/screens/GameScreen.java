@@ -244,9 +244,9 @@ public class GameScreen implements Screen{
 		for (Enemy e : enemies) {
 			e.update(delta, -9.8f);
 			
-			if (e.checkDistanceTiles(p) < 5) {
-				System.out.println(e.checkDistanceTiles(p));
-			}
+//			if (e.checkDistanceTiles(p) < 5) {
+//				System.out.println(e.checkDistanceTiles(p));
+//			}
 			
 			if (e.isAwaken()) {
 				if (inputManager.isKeyPressed(Input.Keys.K)) {
