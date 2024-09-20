@@ -41,12 +41,12 @@ public class GameScreen implements Screen{
 	public RandomGenerator rg = new RandomGenerator();
 	
 	public SpriteBatch batch;
-	public InputManager inputManager;
+	public InputManager inputM;
 	
 //	protected ArrayList<Entity> entities;
 	
-	Player p, p2;
-	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	public Player p;
+	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	
 	ArrayList<Enemy> enemiesToRemove = new ArrayList<Enemy>();
@@ -54,25 +54,25 @@ public class GameScreen implements Screen{
 	
 	final Principal game;
 	
-	TiledGameMap gameMap;
+	public TiledGameMap gameMap;
 	
 	float shootDelayTimer, chargeTimer, power;
 	
-	boolean charging = false, mapChange = true;
+	boolean charging = false, mapChange = false;
 
 	TiledMapTileLayer collisionLayer, entitiesLayer;
 	
 	public GameScreen(final Principal game) {
 		batch = new SpriteBatch();
-		inputManager = new InputManager();
-	    Gdx.input.setInputProcessor(inputManager);
+		inputM = new InputManager();
+	    Gdx.input.setInputProcessor(inputM);
 		this.game = game;
 		
 		shootDelayTimer = 0f;
 		
 	}
 	
-	private void debugMoverCamara() {
+	private void cameraFollowPlayer() {
 //		if (Gdx.input.isTouched()) {
 //			cam.translate(-Gdx.input.getDeltaX(), Gdx.input.getDeltaY());
 //			cam.update();
@@ -81,8 +81,8 @@ public class GameScreen implements Screen{
 		if (p.getX() + p.getLeftBoundary() < MAP_LEFTBOUNDARY) {
 			cam.position.set(MAP_LEFTBOUNDARY, p.getY()+20, 0);
 		}
-		else if (p.getX() + p.getLeftBoundary() > getPixelWidth()-MAP_LEFTBOUNDARY){
-			cam.position.set(getPixelWidth()-MAP_LEFTBOUNDARY, p.getY()+20, 0);
+		else if (p.getX() + p.getLeftBoundary() > gameMap.getPixelWidth()-MAP_LEFTBOUNDARY){
+			cam.position.set(gameMap.getPixelWidth()-MAP_LEFTBOUNDARY, p.getY()+20, 0);
 		}
 		else {
 			cam.position.set(p.getX() + p.getLeftBoundary(), p.getY()+20, 0);
@@ -92,7 +92,7 @@ public class GameScreen implements Screen{
 	private void debugDetectarTile() {
 		if (Gdx.input.justTouched()) {
 			Vector3 pos = cam.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-			TileType type = this.getTileTypeByLocation(1, pos.x, pos.y);
+			TileType type = gameMap.getTileTypeByLocation(1, pos.x, pos.y);
 			
 			if (type != null) {
 				System.out.println("Haz hecho clic al Tile de ID " + type.getId() + ": " + type.getName() + ", " + type.isCollidable() + ", " + type.getDamage());
@@ -117,7 +117,10 @@ public class GameScreen implements Screen{
 		collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
 		entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
 		
-		entitySpawner(getWidth(), getHeight(), entitiesLayer, this);
+		collisionLayer.setVisible(false);
+		entitiesLayer.setVisible(false);
+		
+		gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
 
 	}
 
@@ -129,7 +132,7 @@ public class GameScreen implements Screen{
 			collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
 			entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
 			
-			entitySpawner(getWidth(), getHeight(), entitiesLayer, this);
+			gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
 			
 			collisionLayer.setVisible(false);
 			entitiesLayer.setVisible(false);
@@ -143,22 +146,24 @@ public class GameScreen implements Screen{
 			chargeTimer += delta;
 		}
 		
-		debugMoverCamara();
+		if (p.canCamFollow()) {
+			cameraFollowPlayer();	
+		}
 //		debugDetectarTile();
 		
 		cam.update();
 		gameMap.update(Gdx.graphics.getDeltaTime());
         gameMap.render(cam, game.batch);
         
-        if (inputManager.isKeyReleased(Input.Keys.V)) {
+        if (inputM.isKeyReleased(Input.Keys.V)) {
         	collisionLayer.setVisible(!collisionLayer.isVisible());
         }
         
-        if (inputManager.isKeyReleased(Input.Keys.E)) {
+        if (inputM.isKeyReleased(Input.Keys.E)) {
         	entitiesLayer.setVisible(!entitiesLayer.isVisible());
         }
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
+        if (inputM.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
         	for (Enemy e : enemies) {
     			e.ouch(9999f);
     			
@@ -169,7 +174,7 @@ public class GameScreen implements Screen{
     		}
         }
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_1)) { // Mapa 1
+        if (inputM.isKeyReleased(Input.Keys.NUM_1)) { // Mapa 1
         	gameMap = new TiledGameMap("map.tmx");
         	
         	for (Enemy e : enemies) {
@@ -187,7 +192,7 @@ public class GameScreen implements Screen{
         	
         }
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_3)) { // Mapa 3
+        if (inputM.isKeyReleased(Input.Keys.NUM_3)) { // Mapa 3
         	gameMap = new TiledGameMap("3.tmx");
         	
         	for (Enemy e : enemies) {
@@ -205,7 +210,7 @@ public class GameScreen implements Screen{
         }
         
         
-        if (inputManager.isKeyReleased(Input.Keys.NUM_2)) { // Spawnear Rata
+        if (inputM.isKeyReleased(Input.Keys.NUM_2)) { // Spawnear Rata
         	enemies.add(new EnemyRat(p.getX()+70, p.getY()+100, this));
         }
 		
@@ -249,7 +254,7 @@ public class GameScreen implements Screen{
 //			}
 			
 			if (e.isAwaken()) {
-				if (inputManager.isKeyPressed(Input.Keys.K)) {
+				if (inputM.isKeyPressed(Input.Keys.K)) {
 					if (e.getDirX() == Direcciones.LEFT) {
 		        		bullets.add(new Bullet(e.getX()+e.getLeftBoundary(), e.getY()+20, this, 2, e.getDirX(), true));	
 		        	}
@@ -258,13 +263,18 @@ public class GameScreen implements Screen{
 		        	}
 				}
 				
-				if (inputManager.isKeyPressed(Input.Keys.M)) {
+				if (inputM.isKeyPressed(Input.Keys.M)) {
 					System.out.println(e.checkDistance(p));
 				}
 				
 				if (e.gotRemoved()) {
 					enemiesToRemove.add(e);
 				}	
+				
+				if (e.checkDistanceTiles(p) >= 35) {
+					e.backToSleep();
+				}
+				
 			}
 			else {
 				if (e.checkDistanceTiles(p) <= 2) {
@@ -319,7 +329,7 @@ public class GameScreen implements Screen{
         
 		batch.end();
 		
-		inputManager.update();
+		inputM.update();
 		
 //		System.out.println("Juego Siempre");
 		
@@ -355,147 +365,6 @@ public class GameScreen implements Screen{
 		// TODO Auto-generated method stub
 	
 		System.out.println("Volver al Inicio");
-	}
-	
-	public TileType getTileTypeByLocation(int layer, float x, float y) {
-		return getTileTypeByCoordinate(layer, (int) (x / TileType.TILE_SIZE), (int) (y / TileType.TILE_SIZE));
-	}
-
-	public TileType getTileTypeByCoordinate(int layer, int col, int row) {
-		
-		Cell cell = ((TiledMapTileLayer) gameMap.getTiledMap().getLayers().get(layer)).getCell(col, row);
-		
-		if (cell != null) {
-			TiledMapTile tile = cell.getTile();
-			
-			if (tile != null) {
-				int id = tile.getId();
-				return TileType.getTileTypeByID(id);
-			}
-		}
-		
-		return null;
-	}
-	
-	public boolean doesRectCollideWithMap(float x, float y, int width, int height) {
-		if (x<0 || y<0 || x + width > getPixelWidth() || y + height > getPixelHeight()) {
-			return true;
-		}
-		
-		for (int row = (int) (y / TileType.TILE_SIZE); row < Math.ceil((y+height)) / TileType.TILE_SIZE; row++) {
-			for (int col = (int) (x / TileType.TILE_SIZE); col < Math.ceil((x+width)) / TileType.TILE_SIZE; col++) {
-				for (int layer = 0; layer < getLayers(); layer++) {
-					TileType type = getTileTypeByCoordinate(layer, col, row);
-					if (type != null && type.isCollidable()) {
-						return true;
-					}
-				}
-			}
-		}
-		
-		return false;
-		
-	}
-	
-	public boolean doesRectCollideWithMap(float x, float y, int width, int height, int leftBound) {
-		return doesRectCollideWithMap(x+leftBound, y, width, height);
-		
-	}
-
-	public int getWidth() {
-		return ((TiledMapTileLayer) gameMap.getTiledMap().getLayers().get(0)).getWidth();
-	}
-
-	public int getHeight() {
-		return ((TiledMapTileLayer) gameMap.getTiledMap().getLayers().get(0)).getHeight();
-	}
-
-	public int getLayers() {
-		return gameMap.getTiledMap().getLayers().getCount();
-	}
-	
-	public int getPixelWidth() {
-		return this.getWidth() * TileType.TILE_SIZE;
-	}
-	
-	public int getPixelHeight() {
-		return this.getHeight() * TileType.TILE_SIZE;
-	}
-	
-	
-	/** Spawnea todas las entidades cargadas en el mapa.
-	 * @param mapW - El ancho del Mapa
-	 * @param mapH - El alto del Mapa
-	 * @param eLayer - La capa donde se encuentran los spawns
-	 * @param gameScreen - La gameScreen (Usualmente se usa 'this')
-	 */
-	public void entitySpawner(int mapW, int mapH, TiledMapTileLayer eLayer, GameScreen gameScreen) {
-		
-		boolean hasPlayerSpawned = false;
-		
-		for (int row = 0; row < mapW; row++) {
-			int x = row * TileType.TILE_SIZE;
-			
-			for (int col = 0; col < mapH; col++) {
-				int y = col * TileType.TILE_SIZE;
-				
-				Cell cell = eLayer.getCell(row, col);
-				
-				if (cell != null) {
-					
-					if (!hasPlayerSpawned) {
-						if (checkPropertyValue(cell, "spawner", "player")) {
-							p = new Player(x, y, gameScreen);
-							hasPlayerSpawned = true;
-						}
-					}
-					
-					if (checkPropertyValue(cell, "spawner", "rat")) {
-						enemies.add(new EnemyRat(x, y, gameScreen));
-					}
-					
-					
-				}
-			}
-		}
-		
-		if (!hasPlayerSpawned) {
-			p = new Player(40, 800, gameScreen);
-		}
-		
-	}
-	
-	/** Confirma si la celda tiene una propiedad con nombre 'name' y valor (String) 'value'
-	 * @param cell - La celda/tile a analizar.
-	 * @param name - El nombre de la propiedad a encontrar.
-	 * @param value - El valor que debe tener esa propiedad. ("hola", "pepe", etc...)
-	 * @return - Devuelve 'true' si encuentra lo que busca, 'false' si no lo encuentra.
-	 */
-	public boolean checkPropertyValue(Cell cell, String name, String value) {
-		MapProperties props = cell.getTile().getProperties();
-		return props.containsKey(name) && props.get(name, String.class).equals(value);
-	}
-	
-	/** Confirma si la celda tiene una propiedad con nombre 'name' y valor (Boolean) 'value'
-	 * @param cell - La celda/tile a analizar.
-	 * @param name - El nombre de la propiedad a encontrar.
-	 * @param value - El valor que debe tener esa propiedad. (true, false)
-	 * @return - Devuelve 'true' si encuentra lo que busca, 'false' si no lo encuentra.
-	 */
-	public boolean checkPropertyValue(Cell cell, String name, boolean value) {
-		MapProperties props = cell.getTile().getProperties();
-		return props.containsKey(name) && props.get(name, Boolean.class).equals(value);
-	}
-	
-	/** Confirma si la celda tiene una propiedad con nombre 'name' y valor (Integer) 'value'
-	 * @param cell - La celda/tile a analizar.
-	 * @param name - El nombre de la propiedad a encontrar.
-	 * @param value - El valor que debe tener esa propiedad. (1, 2, 13, 78, etc...)
-	 * @return - Devuelve 'true' si encuentra lo que busca, 'false' si no lo encuentra.
-	 */
-	public boolean checkPropertyValue(Cell cell, String name, int value) {
-		MapProperties props = cell.getTile().getProperties();
-		return props.containsKey(name) && props.get(name, Integer.class).equals(value);
 	}
 
 }

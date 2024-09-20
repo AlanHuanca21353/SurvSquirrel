@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.bitabit.survsquirrel.entity.Entity;
 import com.bitabit.survsquirrel.enums.Direcciones;
 
-public class AnimationManager {
+public class AnimationMethods {
 	
 	/** Genera una Animación para una Entidad usando un Spritesheet de multiples filas.
 	 * @param fps - La velocidad en Frames por Segundo

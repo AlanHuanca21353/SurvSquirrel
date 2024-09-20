@@ -36,6 +36,11 @@ public abstract class Enemy extends Entity {
 	
 	public abstract void sleep();
 	
+	public void backToSleep() {
+		System.out.println("Se durmió un " + type.getId());
+		awaken = false;
+	}
+	
 	public void wakeUp() {
 		System.out.println("Se despertó un " + type.getId());
 		awaken = true;

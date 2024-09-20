@@ -45,7 +45,7 @@ public class EnemyRat extends Enemy {
 
 		hurtAnimation = animM.genEntAnimation(12, hurtImage, this, 2);
 
-		inputManager = gameScreen.inputManager;
+		inputManager = gameScreen.inputM;
 
 		dirX = Direcciones.RIGHT;
 

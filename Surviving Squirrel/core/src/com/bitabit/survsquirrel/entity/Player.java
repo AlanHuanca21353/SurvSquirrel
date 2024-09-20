@@ -37,9 +37,15 @@ public class Player extends Entity {
 	private boolean movingRight, movingLeft, moving, jumping, chargingShot, shooting, dontWalk, dontJump;
 
 	private boolean dead;
+	
+	private boolean camFollow;
+	
+	public Player(float x, float y, GameScreen gS) {
+		this(x,y,gS,false);
+	}
 
-	public Player(float x, float y, GameScreen gameScreen) {
-		super(x, y, EntityType.PLAYER, gameScreen);
+	public Player(float x, float y, GameScreen gS, boolean camFollow) {
+		super(x, y, EntityType.PLAYER, gS);
 
 		hp = 100;
 		bigOuchLimit = 50;
@@ -59,9 +65,11 @@ public class Player extends Entity {
 		chargeAnimation = animM.genEntAnimation(2, chargeImage, this, 4, 2, 2);
 		hurtAnimation = animM.genEntAnimation(12, hurtImage, this, 2);
 		
+		this.camFollow = camFollow;
+		
 		shootTimer = 0f;
 
-		inputManager = gameScreen.inputManager;
+		inputManager = gS.inputM;
 
 		dirX = Direcciones.RIGHT;
 		dirY = Direcciones.NONE;
@@ -370,6 +378,10 @@ public class Player extends Entity {
 
 	public boolean isDead() {
 		return dead;
+	}
+	
+	public boolean canCamFollow() {
+		return camFollow;
 	}
 
 

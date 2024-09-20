@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.bitabit.survsquirrel.enums.AnimationState;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
-import com.bitabit.survsquirrel.tools.AnimationManager;
-import com.bitabit.survsquirrel.tools.AudioManager;
+import com.bitabit.survsquirrel.tools.AnimationMethods;
+import com.bitabit.survsquirrel.tools.AudioMethods;
 import com.bitabit.survsquirrel.tools.RandomGenerator;
 import com.bitabit.survsquirrel.world.TileType;
 
@@ -34,8 +34,8 @@ public abstract class Entity {
 
 	protected float ouchTimer;
 
-	public AudioManager audioM = new AudioManager();
-	public AnimationManager animM = new AnimationManager();
+	public AudioMethods audioM = new AudioMethods();
+	public AnimationMethods animM = new AnimationMethods();
 
 	protected RandomGenerator rg;
 
@@ -70,7 +70,8 @@ public abstract class Entity {
 		this.velocityY += gravity * deltaTime * getWeight();
 		newY += this.velocityY * deltaTime;
 
-		if (gameScreen.doesRectCollideWithMap(pos.x, newY, getCollisionWidth(), getCollisionHeight(), getLeftBoundary())) {
+//		if (gameScreen.doesRectCollideWithMap(pos.x, newY, getCollisionWidth(), getCollisionHeight(), getLeftBoundary())) {
+		if (gameScreen.gameMap.doesRectCollideWithMap(pos.x, newY, getCollisionWidth(), getCollisionHeight(), getLeftBoundary())) {
 			if (velocityY < 0) {
 				this.pos.y = (float) Math.floor(pos.y);
 				grounded = true;
@@ -124,7 +125,7 @@ public abstract class Entity {
 
 	public void moveX(float amount) {
 		float newX = this.pos.x + amount;
-		if (!gameScreen.doesRectCollideWithMap(newX, pos.y, getCollisionWidth(), getCollisionHeight(), getLeftBoundary())) {
+		if (!gameScreen.gameMap.doesRectCollideWithMap(newX, pos.y, getCollisionWidth(), getCollisionHeight(), getLeftBoundary())) {
 			this.pos.x = newX;
 		}
 
@@ -157,7 +158,7 @@ public abstract class Entity {
 	}
 
 	protected Rectangle getArea() {
-		return new Rectangle(pos.x+type.getLeftBoundary(), pos.y, type.getCollisionWidth(), type.getCollisionHeight());
+		return new Rectangle(pos.x+getLeftBoundary(), pos.y, getCollisionWidth(), getCollisionHeight());
 	}
 
 	public boolean collide(Entity ent) {

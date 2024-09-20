@@ -3,7 +3,7 @@ package com.bitabit.survsquirrel.tools;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 
-public class AudioManager {
+public class AudioMethods {
 	
 	private RandomGenerator rg = new RandomGenerator();
 
