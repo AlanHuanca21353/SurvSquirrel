@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -62,6 +63,10 @@ public class GameScreen implements Screen{
 
 	TiledMapTileLayer collisionLayer, entitiesLayer;
 	
+	public Texture bg;
+	
+	public float w, h;
+	
 	public GameScreen(final Principal game) {
 		batch = new SpriteBatch();
 		inputM = new InputManager();
@@ -105,14 +110,16 @@ public class GameScreen implements Screen{
 		// TODO Auto-generated method stub
 		System.out.println("Empezar Juego");
 		
-		float w = Gdx.graphics.getWidth()*0.5f;
-        float h = Gdx.graphics.getHeight()*0.5f;
+		w = Gdx.graphics.getWidth()*0.5f;
+        h = Gdx.graphics.getHeight()*0.5f;
 		
 		cam = new OrthographicCamera();
 		cam.setToOrtho(false, w, h);
 		cam.update();
 		
 		gameMap = new TiledGameMap("map.tmx");
+		
+		bg = new Texture("imagenes/dia.png");
 		
 		collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
 		entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
@@ -127,6 +134,12 @@ public class GameScreen implements Screen{
 	@Override
 	public void render(float delta) {
 		// TODO Auto-generated method stub
+		
+		batch.begin();
+		
+		batch.draw(bg, cam.position.x-w/2, cam.position.y-h/2, w, h);
+		
+		batch.end();
 		
 		if (mapChange) {
 			collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
@@ -153,6 +166,7 @@ public class GameScreen implements Screen{
 		
 		cam.update();
 		gameMap.update(Gdx.graphics.getDeltaTime());
+		
         gameMap.render(cam, game.batch);
         
         if (inputM.isKeyReleased(Input.Keys.V)) {
@@ -233,7 +247,7 @@ public class GameScreen implements Screen{
         }
         
         batch.begin();
-        
+                
         for (Bullet bullet : bullets) {
 			bullet.render(batch);
 		}
@@ -326,7 +340,7 @@ public class GameScreen implements Screen{
 		
 		enemies.removeAll(enemiesToRemove);
 		bullets.removeAll(bulletsToRemove);
-        
+		        
 		batch.end();
 		
 		inputM.update();
