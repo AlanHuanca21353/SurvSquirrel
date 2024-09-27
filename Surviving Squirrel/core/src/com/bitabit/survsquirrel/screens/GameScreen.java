@@ -26,6 +26,7 @@ import com.bitabit.survsquirrel.entity.enemy.Enemy;
 import com.bitabit.survsquirrel.entity.enemy.EnemyRat;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.tools.RandomGenerator;
+import com.bitabit.survsquirrel.world.ParallaxLayer;
 //import com.bitabit.survsquirrel.Rebotante;
 import com.bitabit.survsquirrel.world.TileType;
 import com.bitabit.survsquirrel.world.TiledGameMap;
@@ -65,10 +66,13 @@ public class GameScreen implements Screen{
 	TiledMapTileLayer collisionLayer, entitiesLayer;
 	
 	public Texture bg;
+	public Texture bg2;
 	
 	public float w, h;
 	
 	public Color tint;
+	
+	public ParallaxLayer plx;
 	
 	public GameScreen(final Principal game) {
 		batch = new SpriteBatch();
@@ -133,6 +137,10 @@ public class GameScreen implements Screen{
 		entitiesLayer.setVisible(false);
 		
 		gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
+		
+		plx = new ParallaxLayer(new Texture("imagenes/dia.png"), 0.2f, true, true);
+		
+		plx.setCamera(cam);
 
 	}
 
@@ -142,7 +150,7 @@ public class GameScreen implements Screen{
 		
 		batch.begin();
 		
-		batch.draw(bg, cam.position.x-w/2, cam.position.y-h/2, w, h);
+		plx.render(batch);
 		
 		batch.end();
 		
