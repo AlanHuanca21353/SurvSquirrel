@@ -1,5 +1,6 @@
 package com.bitabit.survsquirrel.tools;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -170,7 +171,7 @@ public class AnimationMethods {
 			tempWidth = e.getSpriteWidth();
 		}
 		
-		batch.draw(image, tempX, e.getY(), tempWidth, e.getSpriteHeight());	
+		batch.draw(image, tempX, e.getY(), tempWidth, e.getSpriteHeight());
 		
 	}
 

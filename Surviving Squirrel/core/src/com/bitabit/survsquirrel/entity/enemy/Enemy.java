@@ -2,6 +2,7 @@ package com.bitabit.survsquirrel.entity.enemy;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.bitabit.survsquirrel.entity.Entity;
 import com.bitabit.survsquirrel.entity.EntityType;

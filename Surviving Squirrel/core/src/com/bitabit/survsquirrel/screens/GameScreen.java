@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -67,11 +68,15 @@ public class GameScreen implements Screen{
 	
 	public float w, h;
 	
+	public Color tint;
+	
 	public GameScreen(final Principal game) {
 		batch = new SpriteBatch();
 		inputM = new InputManager();
 	    Gdx.input.setInputProcessor(inputM);
 		this.game = game;
+		
+		tint = new Color(Color.WHITE);
 		
 		shootDelayTimer = 0f;
 		
@@ -204,6 +209,12 @@ public class GameScreen implements Screen{
         	
         	mapChange = true;
         	
+        	bg = new Texture("imagenes/dia.png"); // Cambiar fondo
+        	
+        	tint.set(Color.WHITE);
+        	
+//        	batch.setColor(Color.WHITE); // Cambiar de Color
+        	
         }
         
         if (inputM.isKeyReleased(Input.Keys.NUM_3)) { // Mapa 3
@@ -221,6 +232,11 @@ public class GameScreen implements Screen{
         	
         	mapChange = true;
         	
+        	bg = new Texture("imagenes/noche.png"); // Cambiar fondo
+        	
+        	tint.set(0.5f, 0.5f, 0.85f, 1f);
+        	
+//        	batch.setColor(0.5f, 0.5f, 0.85f, 1f); // Cambiar de color
         }
         
         

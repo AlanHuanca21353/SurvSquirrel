@@ -3,6 +3,7 @@ package com.bitabit.survsquirrel.entity.enemy;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -195,6 +196,8 @@ public class EnemyRat extends Enemy {
 	@Override
 	public void render(SpriteBatch batch) {
 		//		boolean flip = (getDirX() == Direcciones.LEFT);
+		
+		batch.setColor(gameScreen.tint);
 
 		switch (animState) {
 		case IDLE:
@@ -214,6 +217,8 @@ public class EnemyRat extends Enemy {
 			break;
 			
 		}
+		
+		batch.setColor(Color.WHITE);
 
 	}
 

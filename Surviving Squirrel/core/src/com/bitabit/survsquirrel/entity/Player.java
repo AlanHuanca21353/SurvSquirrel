@@ -5,6 +5,7 @@ import javax.print.attribute.standard.PagesPerMinute;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -282,6 +283,8 @@ public class Player extends Entity {
 
 	@Override
 	public void render(SpriteBatch batch) {
+		
+		batch.setColor(this.gameScreen.tint);
 
 		switch (animState) {
 		case IDLE:
@@ -316,6 +319,8 @@ public class Player extends Entity {
 			animM.drawStaticSprite(batch, deadImage, this);
 			break;
 		}
+		
+		batch.setColor(Color.WHITE);
 
 	}
 
