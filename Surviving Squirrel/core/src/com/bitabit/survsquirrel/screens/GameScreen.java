@@ -41,53 +41,53 @@ public class GameScreen implements Screen{
 	OrthographicCamera cam;
 
 	public RandomGenerator rg = new RandomGenerator();
-	
+
 	public SpriteBatch batch;
 	public InputManager inputM;
-	
-//	protected ArrayList<Entity> entities;
-	
+
+	//	protected ArrayList<Entity> entities;
+
 	public Player p;
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-	
+
 	ArrayList<Enemy> enemiesToRemove = new ArrayList<Enemy>();
 	ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
-	
+
 	final Principal game;
-	
+
 	public TiledGameMap gameMap;
-	
+
 	float shootDelayTimer, chargeTimer, power;
-	
+
 	boolean charging = false, mapChange = false;
 
 	TiledMapTileLayer collisionLayer, entitiesLayer;
-	
+
 	public Texture bg;
-	
+
 	public float w, h;
-	
+
 	public Color tint;
-	
+
 	public GameScreen(final Principal game) {
 		batch = new SpriteBatch();
 		inputM = new InputManager();
-	    Gdx.input.setInputProcessor(inputM);
+		Gdx.input.setInputProcessor(inputM);
 		this.game = game;
-		
+
 		tint = new Color(Color.WHITE);
-		
+
 		shootDelayTimer = 0f;
-		
+
 	}
-	
+
 	private void cameraFollowPlayer() {
-//		if (Gdx.input.isTouched()) {
-//			cam.translate(-Gdx.input.getDeltaX(), Gdx.input.getDeltaY());
-//			cam.update();
-//		}
-		
+		//		if (Gdx.input.isTouched()) {
+		//			cam.translate(-Gdx.input.getDeltaX(), Gdx.input.getDeltaY());
+		//			cam.update();
+		//		}
+
 		if (p.getX() + p.getLeftBoundary() < MAP_LEFTBOUNDARY) {
 			cam.position.set(MAP_LEFTBOUNDARY, p.getY()+20, 0);
 		}
@@ -98,40 +98,40 @@ public class GameScreen implements Screen{
 			cam.position.set(p.getX() + p.getLeftBoundary(), p.getY()+20, 0);
 		}
 	}
-	
+
 	private void debugDetectarTile() {
 		if (Gdx.input.justTouched()) {
 			Vector3 pos = cam.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 			TileType type = gameMap.getTileTypeByLocation(1, pos.x, pos.y);
-			
+
 			if (type != null) {
 				System.out.println("Haz hecho clic al Tile de ID " + type.getId() + ": " + type.getName() + ", " + type.isCollidable() + ", " + type.getDamage());
 			}
 		}
 	}
-	
+
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
 		System.out.println("Empezar Juego");
-		
+
 		w = Gdx.graphics.getWidth()*0.5f;
-        h = Gdx.graphics.getHeight()*0.5f;
-		
+		h = Gdx.graphics.getHeight()*0.5f;
+
 		cam = new OrthographicCamera();
 		cam.setToOrtho(false, w, h);
 		cam.update();
-		
-		gameMap = new TiledGameMap("map.tmx");
-		
-		bg = new Texture("imagenes/dia.png");
-		
+
+		gameMap = new TiledGameMap("1.tmx");
+
+		bg = new Texture("imagenes/1.png");
+
 		collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
 		entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
-		
+
 		collisionLayer.setVisible(false);
 		entitiesLayer.setVisible(false);
-		
+
 		gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
 
 	}
@@ -139,208 +139,192 @@ public class GameScreen implements Screen{
 	@Override
 	public void render(float delta) {
 		// TODO Auto-generated method stub
-		
-		batch.begin();
-		
-		batch.draw(bg, cam.position.x-w/2, cam.position.y-h/2, w, h);
-		
-		batch.end();
-		
-		if (mapChange) {
-			collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
-			entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
-			
-			gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
-			
-			collisionLayer.setVisible(false);
-			entitiesLayer.setVisible(false);
-			
-			mapChange = false;
-		}
-		
-		shootDelayTimer += delta;
-		
-		if (chargeTimer < 2 && charging) {
-			chargeTimer += delta;
-		}
-		
+
+		// debugDetectarTile();
+
+		//-------------------------------------------------------------------------
+		// [Camera]
+		//-------------------------------------------------------------------------
+
 		if (p.canCamFollow()) {
 			cameraFollowPlayer();	
 		}
-//		debugDetectarTile();
-		
+
 		cam.update();
-		gameMap.update(Gdx.graphics.getDeltaTime());
-		
-        gameMap.render(cam, game.batch);
-        
-        if (inputM.isKeyReleased(Input.Keys.V)) {
-        	collisionLayer.setVisible(!collisionLayer.isVisible());
-        }
-        
-        if (inputM.isKeyReleased(Input.Keys.E)) {
-        	entitiesLayer.setVisible(!entitiesLayer.isVisible());
-        }
-        
-        if (inputM.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
-        	for (Enemy e : enemies) {
-    			e.ouch(9999f);
-    			
-    			if (e.gotRemoved()) {
-    				enemiesToRemove.add(e);
-    			}
-    			
-    		}
-        }
-        
-        if (inputM.isKeyReleased(Input.Keys.NUM_1)) { // Mapa 1
-        	gameMap = new TiledGameMap("map.tmx");
-        	
-        	for (Enemy e : enemies) {
-    			e.remove = true;
-    			
-    			if (e.gotRemoved()) {
-    				enemiesToRemove.add(e);
-    			}
-    			
-    		}
-        	
-        	enemies.removeAll(enemiesToRemove);
-        	
-        	mapChange = true;
-        	
-        	bg = new Texture("imagenes/dia.png"); // Cambiar fondo
-        	
-        	tint.set(Color.WHITE);
-        	
-//        	batch.setColor(Color.WHITE); // Cambiar de Color
-        	
-        }
-        
-        if (inputM.isKeyReleased(Input.Keys.NUM_3)) { // Mapa 3
-        	gameMap = new TiledGameMap("3.tmx");
-        	
-        	for (Enemy e : enemies) {
-    			e.remove = true;
-    			
-    			if (e.gotRemoved()) {
-    				enemiesToRemove.add(e);
-    			}
-    			
-    		}
-        	enemies.removeAll(enemiesToRemove);
-        	
-        	mapChange = true;
-        	
-        	bg = new Texture("imagenes/noche.png"); // Cambiar fondo
-        	
-        	tint.set(0.5f, 0.5f, 0.85f, 1f);
-        	
-//        	batch.setColor(0.5f, 0.5f, 0.85f, 1f); // Cambiar de color
-        }
-        
-        
-        if (inputM.isKeyReleased(Input.Keys.NUM_2)) { // Spawnear Rata
-        	enemies.add(new EnemyRat(p.getX()+70, p.getY()+100, this));
-        }
-		
-        if (p.isChargingShot() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Cargar disparo
-        	charging = true;
+		batch.setProjectionMatrix(cam.combined);
+
+		//-------------------------------------------------------------------------
+
+
+		//-------------------------------------------------------------------------
+		// [Deltatime]
+		//-------------------------------------------------------------------------
+
+		shootDelayTimer += delta;
+
+		if (chargeTimer < 2 && charging) {
+			chargeTimer += delta;
 		}
-        
-        if (p.isShooting() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Disparar
-        	shootDelayTimer = 0f;
-        	if (p.isGrounded() && !p.isDead()) {
-	        	if (p.getDirX() == Direcciones.LEFT) {
-	        		bullets.add(new Bullet(p.getX(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));	
-	        	}
-	        	else if (p.getDirX() == Direcciones.RIGHT){
-	        		bullets.add(new Bullet(p.getX()+p.getSpriteWidth(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));
-	        	}
-        	}
-        	chargeTimer = 0f;
-        	charging = false;
-        }
-        
-        batch.begin();
-                
-        for (Bullet bullet : bullets) {
+
+		//-------------------------------------------------------------------------
+		
+		
+		
+		//-------------------------------------------------------------------------
+		// [Renders]
+		//-------------------------------------------------------------------------
+		
+		batch.begin();
+
+		batch.draw(bg, cam.position.x-w/2, cam.position.y-h/2, w, h);
+
+		batch.end();
+
+		gameMap.render(cam, game.batch);
+
+		batch.begin();
+
+		for (Bullet bullet : bullets) {
 			bullet.render(batch);
 		}
-		
-		p.render(cam, batch);
-		
+
+		p.render(batch);
+
 		for (Enemy e : enemies) {
 			e.render(batch);
 		}
 		
-		p.update(delta, -9.8f);
+		batch.end();
+		
+		//-------------------------------------------------------------------------
+		
+		//-------------------------------------------------------------------------
+		// [Game Logic]
+		//-------------------------------------------------------------------------
 
+		if (mapChange) {
+			collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
+			entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
+
+			gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
+
+			collisionLayer.setVisible(false);
+			entitiesLayer.setVisible(false);
+
+			mapChange = false;
+		}
+
+		if (inputM.isKeyReleased(Input.Keys.V)) {
+			collisionLayer.setVisible(!collisionLayer.isVisible());
+		}
+
+		if (inputM.isKeyReleased(Input.Keys.E)) {
+			entitiesLayer.setVisible(!entitiesLayer.isVisible());
+		}
+
+		if (inputM.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
+			for (Enemy e : enemies) {
+				e.ouch(9999f);
+
+				if (e.gotRemoved()) {
+					enemiesToRemove.add(e);
+				}
+
+			}
+		}
+
+		if (inputM.isKeyReleased(Input.Keys.NUM_1)) { // Mapa 1
+			changeMap(1);
+			tint.set(Color.WHITE);
+
+		}
+
+		if (inputM.isKeyReleased(Input.Keys.NUM_2)) { // Mapa 2
+			changeMap(2);
+			tint.set(0.5f, 0.5f, 0.85f, 1f);
+		}
+
+
+		if (inputM.isKeyReleased(Input.Keys.NUM_5)) { // Spawnear Rata
+			enemies.add(new EnemyRat(p.getX()+70, p.getY()+100, this));
+		}
+
+		if (p.isChargingShot() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Cargar disparo
+			charging = true;
+		}
+
+		if (p.isShooting() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Disparar
+			shootDelayTimer = 0f;
+			if (p.isGrounded() && !p.isDead()) {
+				if (p.getDirX() == Direcciones.LEFT) {
+					bullets.add(new Bullet(p.getX(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));	
+				}
+				else if (p.getDirX() == Direcciones.RIGHT){
+					bullets.add(new Bullet(p.getX()+p.getSpriteWidth(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));
+				}
+			}
+			chargeTimer = 0f;
+			charging = false;
+		}
+		
 		for (Enemy e : enemies) {
-			e.update(delta, -9.8f);
-			
-//			if (e.checkDistanceTiles(p) < 5) {
-//				System.out.println(e.checkDistanceTiles(p));
-//			}
-			
+
 			if (e.isAwaken()) {
 				if (inputM.isKeyPressed(Input.Keys.K)) {
 					if (e.getDirX() == Direcciones.LEFT) {
-		        		bullets.add(new Bullet(e.getX()+e.getLeftBoundary(), e.getY()+20, this, 2, e.getDirX(), true));	
-		        	}
-		        	else if (e.getDirX() == Direcciones.RIGHT){
-		        		bullets.add(new Bullet(e.getX()+e.getCollisionWidth(), e.getY()+20, this, 2, e.getDirX(), true));
-		        	}
+						bullets.add(new Bullet(e.getX()+e.getLeftBoundary(), e.getY()+20, this, 2, e.getDirX(), true));	
+					}
+					else if (e.getDirX() == Direcciones.RIGHT){
+						bullets.add(new Bullet(e.getX()+e.getCollisionWidth(), e.getY()+20, this, 2, e.getDirX(), true));
+					}
 				}
-				
+
 				if (inputM.isKeyPressed(Input.Keys.M)) {
 					System.out.println(e.checkDistance(p));
 				}
-				
+
 				if (e.gotRemoved()) {
 					enemiesToRemove.add(e);
 				}	
-				
+
 				if (e.checkDistanceTiles(p) >= 35) {
 					e.backToSleep();
 				}
-				
+
 			}
 			else {
 				if (e.checkDistanceTiles(p) <= 2) {
 					e.wakeUp();
 				}
 			}
-			
+
 		}
 		
 		for (Bullet bullet : bullets) {
-			
+
 			if (bullet.getDirX() == null) {
 				bullet.setDirX(p.getDirX());
 			}
-			
-			bullet.update(delta, -9.8f);
-			
+
 			for (Enemy e : enemies) {
-				
+
 				if (!bullet.hurtPlayer) {
 					if (bullet.collide(e)){
-//						System.out.println("Ouch!");
-						
+						//						System.out.println("Ouch!");
+
 						e.ouch(bullet.getDmg(), bullet.getDirX());
-						
+
 						bullet.remove = true;
 					}	
 				}
 			}
-			
+
 			if (bullet.hurtPlayer && !p.isDead()) {
 				if (bullet.collide(p)) {
-//					System.out.println("Ardilla: Ouch!");
-					
+					//					System.out.println("Ardilla: Ouch!");
+
 					p.ouch(5, bullet.getDirX());
-					
+
 					bullet.remove = true;
 				}
 			}
@@ -348,53 +332,90 @@ public class GameScreen implements Screen{
 			if (bullet.isGrounded()) {
 				bullet.remove = true;
 			}
-			
+
 			if (bullet.gotRemoved()) {
 				bulletsToRemove.add(bullet);
 			}
 		}
-		
+
 		enemies.removeAll(enemiesToRemove);
 		bullets.removeAll(bulletsToRemove);
-		        
-		batch.end();
+		
+		//-------------------------------------------------------------------------
+		
+		//-------------------------------------------------------------------------
+		// [Updates]
+		//-------------------------------------------------------------------------
+				
+		gameMap.update(Gdx.graphics.getDeltaTime());
+
+		p.update(delta, -9.8f);
+
+		for (Enemy e : enemies) {
+			e.update(delta, -9.8f);
+		}
+		
+		for (Bullet bullet : bullets) {
+			bullet.update(delta, -9.8f);
+		}
 		
 		inputM.update();
-		
-//		System.out.println("Juego Siempre");
-		
+				
+		//-------------------------------------------------------------------------
+
+		//		System.out.println("Juego Siempre");
+
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
-		
-//		System.out.println("Cambio de Tamaño de Ventana");
+
+		//		System.out.println("Cambio de Tamaño de Ventana");
 	}
 
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-	
+
 		System.out.println("Volver al Inicio");
+	}
+
+	public void changeMap(int mapNum) {
+		gameMap = new TiledGameMap(mapNum + ".tmx");
+
+		for (Enemy e : enemies) {
+			e.remove = true;
+
+			if (e.gotRemoved()) {
+				enemiesToRemove.add(e);
+			}
+
+		}
+		enemies.removeAll(enemiesToRemove);
+
+		mapChange = true;
+
+		bg = new Texture("imagenes/" + mapNum + ".png"); // Cambiar fondo
+
 	}
 
 }
