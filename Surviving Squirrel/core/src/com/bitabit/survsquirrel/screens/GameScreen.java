@@ -25,6 +25,8 @@ import com.bitabit.survsquirrel.entity.attack.Bullet;
 import com.bitabit.survsquirrel.entity.enemy.Enemy;
 import com.bitabit.survsquirrel.entity.enemy.EnemyRat;
 import com.bitabit.survsquirrel.enums.Direcciones;
+import com.bitabit.survsquirrel.events.ChangeMapEvent;
+import com.bitabit.survsquirrel.events.Listeners;
 import com.bitabit.survsquirrel.tools.RandomGenerator;
 //import com.bitabit.survsquirrel.Rebotante;
 import com.bitabit.survsquirrel.world.TileType;
@@ -33,7 +35,7 @@ import com.bitabit.survsquirrel.world.TiledGameMap;
 /**
  * 
  */
-public class GameScreen implements Screen{
+public class GameScreen implements Screen, ChangeMapEvent{
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
 	private static final int MAP_LEFTBOUNDARY = 320;
@@ -133,11 +135,14 @@ public class GameScreen implements Screen{
 		entitiesLayer.setVisible(false);
 
 		gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
+		
+		Listeners.addListeners(this);
 
 	}
 
 	@Override
 	public void render(float delta) {
+		
 		// TODO Auto-generated method stub
 
 		// debugDetectarTile();
@@ -202,18 +207,6 @@ public class GameScreen implements Screen{
 		// [Game Logic]
 		//-------------------------------------------------------------------------
 
-		if (mapChange) {
-			collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
-			entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
-
-			gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
-
-			collisionLayer.setVisible(false);
-			entitiesLayer.setVisible(false);
-
-			mapChange = false;
-		}
-
 		if (inputM.isKeyReleased(Input.Keys.V)) {
 			collisionLayer.setVisible(!collisionLayer.isVisible());
 		}
@@ -234,13 +227,13 @@ public class GameScreen implements Screen{
 		}
 
 		if (inputM.isKeyReleased(Input.Keys.NUM_1)) { // Mapa 1
-			changeMap(1);
+			Listeners.executeMapChange(1);
 			tint.set(Color.WHITE);
 
 		}
 
 		if (inputM.isKeyReleased(Input.Keys.NUM_2)) { // Mapa 2
-			changeMap(2);
+			Listeners.executeMapChange(2);
 			tint.set(0.5f, 0.5f, 0.85f, 1f);
 		}
 
@@ -395,11 +388,12 @@ public class GameScreen implements Screen{
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-
 		System.out.println("Volver al Inicio");
 	}
 
+	@Override
 	public void changeMap(int mapNum) {
+		
 		gameMap = new TiledGameMap(mapNum + ".tmx");
 
 		for (Enemy e : enemies) {
@@ -412,10 +406,15 @@ public class GameScreen implements Screen{
 		}
 		enemies.removeAll(enemiesToRemove);
 
-		mapChange = true;
+		collisionLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Colisiones");
+		entitiesLayer = (TiledMapTileLayer) gameMap.getTiledMap().getLayers().get("Entities");
+
+		gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
+
+		collisionLayer.setVisible(false);
+		entitiesLayer.setVisible(false);
 
 		bg = new Texture("imagenes/" + mapNum + ".png"); // Cambiar fondo
-
+	
 	}
-
 }
