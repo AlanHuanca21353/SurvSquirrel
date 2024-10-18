@@ -22,7 +22,6 @@ public class Principal extends Game {
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 1);
 		
-		
 //		if (inputManager.isKeyPressed(Input.Keys.A)) {
 //			System.out.println("A Pressed");
 //		}

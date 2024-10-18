@@ -20,22 +20,31 @@ public class Player extends Entity {
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
 
+	private static final float SMACK_WAIT_TIME = 0.4f;
+	
 	private static final int SPEED = 160;
 	private static final int RUN_SPEED = 240;
 	private static final int JUMP_VELOCITY = 4;
 
 	InputManager inputManager;
 
-	Texture idleImage, walkImage, jumpImage, fallImage, shootImage, chargeImage, hurtImage, deadImage;
+	Texture idleImage, walkImage, jumpImage, fallImage, 
+	shootImage, chargeImage, hurtImage, deadImage,
+	smackImage;
+	
 	TextureRegion[] animationFrames;
-	Animation<TextureRegion> walkAnimation, jumpAnimation, fallAnimation, chargeAnimation, hurtAnimation;
+	
+	Animation<TextureRegion> walkAnimation, jumpAnimation, 
+	fallAnimation, chargeAnimation, hurtAnimation;
 
-	float shootTimer, shootDelayTimer;
+	float shootTimer, shootDelayTimer, 
+	smackTimer, smackDelayTimer, atkStartX;
 
-	public Sound jumpSound, slingShotSound, hurtSound, deathSound, reviveSound;
-	Sound walkSound;
+	public Sound jumpSound, slingShotSound, hurtSound, 
+	deathSound, reviveSound, walkSound;
 
-	private boolean movingRight, movingLeft, moving, jumping, chargingShot, shooting, dontWalk, dontJump;
+	private boolean movingRight, movingLeft, moving, jumping, 
+	chargingShot, shooting, smacking, dontWalk, dontJump;
 
 	private boolean dead;
 	
@@ -59,6 +68,7 @@ public class Player extends Entity {
 		chargeImage = new Texture("imagenes/nuez_charge.png");
 		hurtImage = new Texture("imagenes/nuez_ouch.png");
 		deadImage = new Texture("imagenes/nuez_dead.png");
+		smackImage = new Texture("imagenes/nuez_attack.png");
 
 		walkAnimation = animM.genEntAnimation(12, walkImage, this, 4, 2, 2);
 		jumpAnimation = animM.genEntAnimation(12, jumpImage, this , 4, 2, 2);
@@ -89,6 +99,7 @@ public class Player extends Entity {
 		jumping = false;
 		shooting = false;
 		chargingShot = false;
+		smacking = false;
 	}
 
 	@Override
@@ -96,6 +107,7 @@ public class Player extends Entity {
 
 		if (!dead) {
 			shootDelayTimer += deltaTime;
+			smackDelayTimer += deltaTime;
 
 			//		System.out.println(animTime);
 
@@ -142,6 +154,15 @@ public class Player extends Entity {
 
 					chargingShot = false;
 					shooting = true;
+				}
+				
+				if (inputManager.isKeyDown(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME) {
+					smackDelayTimer = 0f;
+					
+					audioM.playSound(slingShotSound, 0.6f, 0.5f, 0.7f);
+					
+					smacking = true;
+					
 				}
 
 				if (jumping) { // Salto inicial
@@ -197,6 +218,16 @@ public class Player extends Entity {
 					dontJump = false;
 				}
 			}
+			
+			if (smacking) {
+				smackTimer += deltaTime;
+				newAnimState = AnimationState.SMACK;
+				if (smackTimer >= 0.3f) {
+					smackTimer = 0f;
+					smacking = false;
+				}
+				
+			}
 
 			// Mover
 			if (movingLeft && !hit) { // Mover Izquierda
@@ -208,7 +239,7 @@ public class Player extends Entity {
 				}
 
 				this.dirX = Direcciones.LEFT;
-				if (!jumping && grounded) {
+				if (!jumping && grounded && !smacking) {
 					newAnimState = AnimationState.WALKING;	
 				}
 
@@ -224,7 +255,7 @@ public class Player extends Entity {
 				}
 
 				this.dirX = Direcciones.RIGHT;
-				if (!jumping && grounded) {
+				if (!jumping && grounded && !smacking) {
 					newAnimState = AnimationState.WALKING;	
 				}
 
@@ -318,6 +349,11 @@ public class Player extends Entity {
 		case DEAD:
 			animM.drawStaticSprite(batch, deadImage, this);
 			break;
+		
+		case SMACK:
+			animM.drawStaticSprite(batch, smackImage, this);
+			break;
+			
 		}
 		
 		batch.setColor(Color.WHITE);
@@ -358,6 +394,10 @@ public class Player extends Entity {
 
 	public boolean isChargingShot() {
 		return chargingShot;
+	}
+	
+	public boolean isSmacking() {
+		return smacking;
 	}
 
 	public void die() {

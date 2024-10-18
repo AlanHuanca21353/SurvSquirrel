@@ -40,6 +40,8 @@ public abstract class Entity {
 	protected RandomGenerator rg;
 
 	protected float animTime;
+	
+	public float atkStartX;
 
 	public Entity(float x, float y, EntityType type, GameScreen gameScreen) {
 		this.pos = new Vector2(x,y);
@@ -51,6 +53,13 @@ public abstract class Entity {
 	}
 
 	public void update(float deltaTime, float gravity) {
+		
+		if (getDirX() == Direcciones.LEFT) {
+			atkStartX = getX() + getLeftBoundary();	
+		}
+		else if (getDirX() == Direcciones.RIGHT) {
+			atkStartX = getX() + getCollisionWidth();
+		}
 
 		if (animState != newAnimState) {
 			animChange = true;
@@ -116,6 +125,25 @@ public abstract class Entity {
 		ouch(damage);
 
 	}
+	
+	public void bigOuch(float damage, Direcciones dirX) {
+		bigOuch = true;
+		
+		switch (dirX) {
+		case LEFT:
+			hitRight = true;
+			break;
+
+		case RIGHT:
+			hitLeft = true;
+			break;
+
+		default:
+			break;
+		}
+		
+		ouch(damage);
+	}
 
 	public float getHP() {
 		return hp;
@@ -147,6 +175,10 @@ public abstract class Entity {
 		}
 
 		return b-a;
+	}
+	
+	public float getAtkStartX() {
+		return atkStartX;
 	}
 
 	public Vector2 getPos() {

@@ -2,7 +2,9 @@ package com.bitabit.survsquirrel.entity.attack;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.bitabit.survsquirrel.entity.Entity;
 import com.bitabit.survsquirrel.entity.EntityType;
+import com.bitabit.survsquirrel.entity.Player;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
 
@@ -30,6 +32,14 @@ public class Bullet extends Attack {
 
 		this.hurtPlayer = hurtPlayer;
 		
+	}
+	
+	public Bullet(Entity e, GameScreen gS, float power) {
+		this(e.getAtkStartX(), e.getY()+20, gS, power, e.getDirX());
+	}
+	
+	public Bullet(Entity e, GameScreen gS, float power, boolean hurtPlayer) {
+		this(e.getAtkStartX(), e.getY()+20, gS, power, e.getDirX(), hurtPlayer);
 	}
 
 	public void update(float deltaTime, float gravity) {

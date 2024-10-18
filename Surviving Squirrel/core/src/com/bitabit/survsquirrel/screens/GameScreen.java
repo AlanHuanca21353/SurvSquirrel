@@ -22,6 +22,7 @@ import com.bitabit.survsquirrel.Principal;
 import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.entity.Player;
 import com.bitabit.survsquirrel.entity.attack.Bullet;
+import com.bitabit.survsquirrel.entity.attack.SquirrelTail;
 import com.bitabit.survsquirrel.entity.enemy.Enemy;
 import com.bitabit.survsquirrel.entity.enemy.EnemyRat;
 import com.bitabit.survsquirrel.enums.Direcciones;
@@ -38,6 +39,8 @@ import com.bitabit.survsquirrel.world.TiledGameMap;
 public class GameScreen implements Screen, ChangeMapEvent{
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
+	private static final float SMACK_WAIT_TIME = 0.4f;
+	
 	private static final int MAP_LEFTBOUNDARY = 320;
 
 	OrthographicCamera cam;
@@ -52,15 +55,17 @@ public class GameScreen implements Screen, ChangeMapEvent{
 	public Player p;
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	ArrayList<SquirrelTail> tails = new ArrayList<SquirrelTail>();
 
 	ArrayList<Enemy> enemiesToRemove = new ArrayList<Enemy>();
 	ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
+	ArrayList<SquirrelTail> tailsToRemove = new ArrayList<SquirrelTail>();
 
 	final Principal game;
 
 	public TiledGameMap gameMap;
 
-	float shootDelayTimer, chargeTimer, power;
+	float shootDelayTimer, smackDelayTimer, chargeTimer, power;
 
 	boolean charging = false, mapChange = false;
 
@@ -166,6 +171,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		//-------------------------------------------------------------------------
 
 		shootDelayTimer += delta;
+		smackDelayTimer += delta;
 
 		if (chargeTimer < 2 && charging) {
 			chargeTimer += delta;
@@ -249,27 +255,30 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		if (p.isShooting() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Disparar
 			shootDelayTimer = 0f;
 			if (p.isGrounded() && !p.isDead()) {
-				if (p.getDirX() == Direcciones.LEFT) {
-					bullets.add(new Bullet(p.getX(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));	
-				}
-				else if (p.getDirX() == Direcciones.RIGHT){
-					bullets.add(new Bullet(p.getX()+p.getSpriteWidth(), p.getY()+20, this, Math.round(chargeTimer), p.getDirX()));
-				}
+				bullets.add(new Bullet(p, this, Math.round(chargeTimer)));
 			}
 			chargeTimer = 0f;
 			charging = false;
 		}
 		
+		if (inputM.isKeyPressed(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME) {
+			tails.add(new SquirrelTail(p, this, 1.5f));
+			System.out.println("Agregar Cola");
+		}
+		
+//		if (p.isSmacking() && smackDelayTimer >= SMACK_WAIT_TIME && !p.isMoving()) {
+//			smackDelayTimer = 0f;
+//			if (p.isGrounded() && !p.isDead()) {
+//				tails.add(new SquirrelTail(p, this, 2));
+//				System.out.println("Cola spawn");
+//			}
+//		}
+		
 		for (Enemy e : enemies) {
 
 			if (e.isAwaken()) {
 				if (inputM.isKeyPressed(Input.Keys.K)) {
-					if (e.getDirX() == Direcciones.LEFT) {
-						bullets.add(new Bullet(e.getX()+e.getLeftBoundary(), e.getY()+20, this, 2, e.getDirX(), true));	
-					}
-					else if (e.getDirX() == Direcciones.RIGHT){
-						bullets.add(new Bullet(e.getX()+e.getCollisionWidth(), e.getY()+20, this, 2, e.getDirX(), true));
-					}
+					bullets.add(new Bullet(e, this, 2, true));
 				}
 
 				if (inputM.isKeyPressed(Input.Keys.M)) {
@@ -293,46 +302,72 @@ public class GameScreen implements Screen, ChangeMapEvent{
 
 		}
 		
-		for (Bullet bullet : bullets) {
+		for (Bullet b : bullets) {
 
-			if (bullet.getDirX() == null) {
-				bullet.setDirX(p.getDirX());
+			if (b.getDirX() == null) {
+				b.setDirX(p.getDirX());
 			}
 
 			for (Enemy e : enemies) {
 
-				if (!bullet.hurtPlayer) {
-					if (bullet.collide(e)){
+				if (!b.hurtPlayer) {
+					if (b.collide(e)){
 						//						System.out.println("Ouch!");
 
-						e.ouch(bullet.getDmg(), bullet.getDirX());
+						e.ouch(b.getDmg(), b.getDirX());
 
-						bullet.remove = true;
+						b.remove = true;
 					}	
 				}
 			}
 
-			if (bullet.hurtPlayer && !p.isDead()) {
-				if (bullet.collide(p)) {
+			if (b.hurtPlayer && !p.isDead()) {
+				if (b.collide(p)) {
 					//					System.out.println("Ardilla: Ouch!");
 
-					p.ouch(5, bullet.getDirX());
+					p.ouch(5, b.getDirX());
 
-					bullet.remove = true;
+					b.remove = true;
 				}
 			}
 
-			if (bullet.isGrounded()) {
-				bullet.remove = true;
+			if (b.isGrounded()) {
+				b.remove = true;
 			}
 
-			if (bullet.gotRemoved()) {
-				bulletsToRemove.add(bullet);
+			if (b.gotRemoved()) {
+				bulletsToRemove.add(b);
+			}
+		}
+		
+		for (SquirrelTail t : tails) {
+			
+			if (t.getDirX() == null) {
+				t.setDirX(p.getDirX());
+			}
+			
+			t.setX(p.getAtkStartX());
+			
+			for (Enemy e : enemies) {
+				if (t.collide(e) && !e.gotHit()){
+					//						System.out.println("Ouch!");
+
+					System.out.println("¡Pegaste con la cola!");
+					
+					e.bigOuch(t.getDmg(), t.getDirX());
+
+				}	
+			}
+			
+			
+			if (t.gotRemoved()) {
+				tailsToRemove.add(t);
 			}
 		}
 
 		enemies.removeAll(enemiesToRemove);
 		bullets.removeAll(bulletsToRemove);
+		tails.removeAll(tailsToRemove);
 		
 		//-------------------------------------------------------------------------
 		
@@ -348,8 +383,12 @@ public class GameScreen implements Screen, ChangeMapEvent{
 			e.update(delta, -9.8f);
 		}
 		
-		for (Bullet bullet : bullets) {
-			bullet.update(delta, -9.8f);
+		for (Bullet b : bullets) {
+			b.update(delta, -9.8f);
+		}
+		
+		for (SquirrelTail t : tails) {
+			t.update(delta);
 		}
 		
 		inputM.update();

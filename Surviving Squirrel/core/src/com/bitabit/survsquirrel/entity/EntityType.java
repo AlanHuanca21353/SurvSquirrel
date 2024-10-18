@@ -4,7 +4,8 @@ public enum EntityType {
 	
 	PLAYER("player", 44, 40, 20, 20, 12, 100),
 	ENEMYRAT("rat", 60, 70, 20, 40, 20, 100),
-	BULLET("bullet", 5, 5, 18);
+	BULLET("bullet", 5, 5, 18),
+	SQUIRRELTAIL("squirreltail", 20, 32, 0);
 	
 	private String id;
 	private int spriteWidth, spriteHeight, collisionW, collisionH, leftBoundary;
