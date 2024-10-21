@@ -28,6 +28,7 @@ import com.bitabit.survsquirrel.entity.enemy.EnemyRat;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.events.ChangeMapEvent;
 import com.bitabit.survsquirrel.events.Listeners;
+import com.bitabit.survsquirrel.hud.Hud;
 import com.bitabit.survsquirrel.tools.RandomGenerator;
 //import com.bitabit.survsquirrel.Rebotante;
 import com.bitabit.survsquirrel.world.TileType;
@@ -37,6 +38,8 @@ import com.bitabit.survsquirrel.world.TiledGameMap;
  * 
  */
 public class GameScreen implements Screen, ChangeMapEvent{
+	
+	private Hud hud;
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
 	private static final float SMACK_WAIT_TIME = 0.4f;
@@ -142,6 +145,8 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		gameMap.entitySpawner(gameMap.getWidth(), gameMap.getHeight(), entitiesLayer, this);
 		
 		Listeners.addListeners(this);
+		
+		hud = new Hud();
 
 	}
 
@@ -396,6 +401,14 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		//-------------------------------------------------------------------------
 
 		//		System.out.println("Juego Siempre");
+		
+		hud.setLabel("HP: ", (int) p.getHP());
+		
+		batch.begin();
+		
+		hud.dibujar();
+		
+		batch.end();
 
 	}
 

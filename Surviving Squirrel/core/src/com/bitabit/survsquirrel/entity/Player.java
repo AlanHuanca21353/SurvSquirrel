@@ -104,6 +104,10 @@ public class Player extends Entity {
 
 	@Override
 	public void update(float deltaTime, float gravity) {
+		
+		if (hp < 0) {
+			hp = 0;
+		}
 
 		if (!dead) {
 			shootDelayTimer += deltaTime;
