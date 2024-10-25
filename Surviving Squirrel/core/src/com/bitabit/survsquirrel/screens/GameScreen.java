@@ -28,7 +28,7 @@ import com.bitabit.survsquirrel.entity.enemy.EnemyRat;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.events.ChangeMapEvent;
 import com.bitabit.survsquirrel.events.Listeners;
-import com.bitabit.survsquirrel.hud.Hud;
+import com.bitabit.survsquirrel.hud.GameHud;
 import com.bitabit.survsquirrel.tools.RandomGenerator;
 //import com.bitabit.survsquirrel.Rebotante;
 import com.bitabit.survsquirrel.world.TileType;
@@ -39,7 +39,7 @@ import com.bitabit.survsquirrel.world.TiledGameMap;
  */
 public class GameScreen implements Screen, ChangeMapEvent{
 	
-	private Hud hud;
+	private GameHud hud;
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
 	private static final float SMACK_WAIT_TIME = 0.4f;
@@ -64,7 +64,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 	ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
 	ArrayList<SquirrelTail> tailsToRemove = new ArrayList<SquirrelTail>();
 
-	final Principal game;
+	final Principal pr;
 
 	public TiledGameMap gameMap;
 
@@ -80,11 +80,11 @@ public class GameScreen implements Screen, ChangeMapEvent{
 
 	public Color tint;
 
-	public GameScreen(final Principal game) {
+	public GameScreen(final Principal pr) {
 		batch = new SpriteBatch();
 		inputM = new InputManager();
 		Gdx.input.setInputProcessor(inputM);
-		this.game = game;
+		this.pr = pr;
 
 		tint = new Color(Color.WHITE);
 
@@ -146,12 +146,18 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		
 		Listeners.addListeners(this);
 		
-		hud = new Hud();
+		hud = new GameHud();
 
 	}
 
 	@Override
 	public void render(float delta) {
+		
+		if (inputM.isKeyReleased(Input.Keys.P)) {
+			cam.setToOrtho(false);
+			pr.setScreen(new MainMenuScreen(pr));
+			this.dispose();
+		}
 		
 		// TODO Auto-generated method stub
 
@@ -196,7 +202,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 
 		batch.end();
 
-		gameMap.render(cam, game.batch);
+		gameMap.render(cam, pr.batch);
 
 		batch.begin();
 
@@ -225,6 +231,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		if (inputM.isKeyReleased(Input.Keys.E)) {
 			entitiesLayer.setVisible(!entitiesLayer.isVisible());
 		}
+
 
 		if (inputM.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
 			for (Enemy e : enemies) {
@@ -281,27 +288,56 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		
 		for (Enemy e : enemies) {
 
-			if (e.isAwaken()) {
-				if (inputM.isKeyPressed(Input.Keys.K)) {
-					bullets.add(new Bullet(e, this, 2, true));
+			if (e instanceof EnemyRat) {
+				if (e.isAwaken()) {
+//					if (inputM.isKeyPressed(Input.Keys.K)) {
+//						bullets.add(new Bullet(e, this, 2, true));
+//					}
+//
+//					if (inputM.isKeyPressed(Input.Keys.M)) {
+//						System.out.println(e.checkDistance(p));
+//					}
+
+					if (e.gotRemoved()) {
+						enemiesToRemove.add(e);
+					}	
+					
+//					System.out.println(Math.round(e.checkDistanceLR(p)));
+					
+					if (Math.round(e.checkDistanceLR(p)) < -20) {
+						((EnemyRat)e).walkToLeft(delta);
+					}
+					else if (Math.round(e.checkDistanceLR(p)) > 20) {
+						((EnemyRat)e).walkToRight(delta);
+					}
+					
+					else {
+						((EnemyRat)e).moving = false;
+					}
+					
+//					System.out.println(((EnemyRat)e).isMoving());
+					
+					if (p.getPos().y > e.getPos().y) {
+						if (rg.genRandomInt(1, 20) == 1) {
+							((EnemyRat)e).jump();
+						}
+					}
+					
+					if (((EnemyRat)e).isMoving()){
+						if (rg.genRandomInt(1, 200) == 1) {
+							((EnemyRat)e).jump();
+						}
+					}
+
+					if (e.checkDistanceTiles(p) >= 35) {
+						e.backToSleep();
+					}
+
 				}
-
-				if (inputM.isKeyPressed(Input.Keys.M)) {
-					System.out.println(e.checkDistance(p));
-				}
-
-				if (e.gotRemoved()) {
-					enemiesToRemove.add(e);
-				}	
-
-				if (e.checkDistanceTiles(p) >= 35) {
-					e.backToSleep();
-				}
-
-			}
-			else {
-				if (e.checkDistanceTiles(p) <= 2) {
-					e.wakeUp();
+				else {
+					if (e.checkDistanceTiles(p) <= 4) {
+						e.wakeUp();
+					}
 				}
 			}
 

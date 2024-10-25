@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.bitabit.survsquirrel.tools.Colores;
 import com.bitabit.survsquirrel.tools.EstiloFuente;
 
-public class Hud implements HeadsUpDisplay{
+public class GameHud implements HeadsUpDisplay{
 
 	private Stage stage;
 	private ScreenViewport vw;
@@ -20,7 +20,7 @@ public class Hud implements HeadsUpDisplay{
 	
 	
 
-	public Hud() {
+	public GameHud() {
 	    System.out.println("Soy el Hud");
 	    crearFuentes(); // Primero crear las fuentes
 	    crearActores(); // Después de crear las fuentes

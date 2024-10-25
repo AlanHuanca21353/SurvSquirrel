@@ -177,6 +177,19 @@ public abstract class Entity {
 		return b-a;
 	}
 	
+	public float checkDistanceLR(Entity ent) {
+		float a, b;
+		
+		a = pos.x;
+		b = ent.getPos().x;
+
+		return b-a;
+	}
+	
+	public float checkDistanceLRTiles(Entity ent) {
+		return (int) checkDistanceLR(ent)/TileType.TILE_SIZE;
+	}
+	
 	public float getAtkStartX() {
 		return atkStartX;
 	}

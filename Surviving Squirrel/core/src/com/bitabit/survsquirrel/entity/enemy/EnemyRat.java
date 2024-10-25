@@ -31,8 +31,12 @@ public class EnemyRat extends Enemy {
 
 	Animation<TextureRegion> hurtAnimation;
 
-	private boolean movingRight, movingLeft, moving, jumping, dontWalk = false, dontJump = false;
-	private float count;
+	private boolean movingRight, movingLeft;
+	public boolean moving;
+	private boolean jumping;
+	private boolean dontWalk = false;
+	private boolean dontJump = false;
+	private float count, jumpDelayTimer;
 
 	public EnemyRat(float x, float y, GameScreen gameScreen) {
 		super(x, y, EntityType.ENEMYRAT, gameScreen);
@@ -69,76 +73,22 @@ public class EnemyRat extends Enemy {
 
 	@Override
 	public void update(float deltaTime, float gravity) {
+		
+		jumpDelayTimer += deltaTime;
 
 		if (awaken) {
-			if (!dontJump) {
-				if (inputManager.isKeyDown(Input.Keys.UP) && !dontJump) {
-					jumping = true;
-				}
-
-				if (inputManager.isKeyReleased(Input.Keys.UP) && !dontJump) {
-					jumping = false;
-				}	
-			}
-
-			if (movingLeft || movingRight) {
-				moving = true;
-			}
-			else {
-				moving = false;
-			}
 
 			if (grounded) { // Si estás en el suelo
 				if (!hit) {
 					newAnimState = AnimationState.IDLE;	
 				}
-
-				if (jumping) { // Salto inicial
-					this.velocityY += JUMP_VELOCITY * getWeight();
-
-					audioM.playSound(jumpSound, 0.5f, 0.65f, 0.85f);
-				}
 			}
 			else { // Si estás en el aire
 
 				// Si mantenes pulsado despues de saltar, saltas mas alto.
-				if (jumping && this.velocityY > 0) {
+				if (jumping && this.velocityY > 0 && !dontJump) {
 					this.velocityY += JUMP_VELOCITY * getWeight() * deltaTime;
 				}
-			}
-
-			if (!dontWalk) { // Si se permite caminar
-
-				if (inputManager.isKeyDown(Input.Keys.LEFT)) {
-					movingLeft = true;
-				} 
-				if (inputManager.isKeyReleased(Input.Keys.LEFT)) {
-					movingLeft = false;
-				}
-				if (inputManager.isKeyDown(Input.Keys.RIGHT)) {
-					movingRight = true;
-				}
-				if (inputManager.isKeyReleased(Input.Keys.RIGHT)) {
-					movingRight = false;
-				}
-
-			}
-
-			// Mover
-			if (movingLeft && !hit) { // Mover Izquierda
-				moveX(-SPEED * deltaTime);	
-
-				this.dirX = Direcciones.LEFT;
-
-
-			}
-
-			if (movingRight && !hit) { // Mover Derecha
-				moveX(SPEED * deltaTime);
-
-				this.dirX = Direcciones.RIGHT;
-
-
 			}	
 		}
 		else {
@@ -235,6 +185,41 @@ public class EnemyRat extends Enemy {
 	@Override
 	public void sleep() {
 		newAnimState = AnimationState.SLEEPING;
+	}
+	
+	public void walkToLeft(float delta) {
+		if (!hit && !dontWalk) {
+			moveX(-SPEED * delta);	
+			this.dirX = Direcciones.LEFT;
+		}
+		
+		if (!moving) { moving = true; }
+		
+	}
+	
+	public void walkToRight(float delta) {
+		if (!hit && !dontWalk) {
+			moveX(SPEED * delta);
+			this.dirX = Direcciones.RIGHT;
+		}
+		
+		if (!moving) { moving = true; }
+	}
+	
+	public void jump() {
+		if (jumpDelayTimer > 1f) {
+			if (!dontJump) {
+				this.velocityY += JUMP_VELOCITY * getWeight();
+
+				audioM.playSound(jumpSound, 0.5f, 0.65f, 0.85f);
+			}	
+			
+			jumpDelayTimer = 0f;
+		}
+	}
+	
+	public boolean isMoving() {
+		return moving;
 	}
 
 }
