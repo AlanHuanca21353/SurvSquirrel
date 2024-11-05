@@ -17,6 +17,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.bitabit.survsquirrel.InputManager;
 import com.bitabit.survsquirrel.Principal;
 import com.bitabit.survsquirrel.entity.EntityType;
@@ -39,7 +41,10 @@ import com.bitabit.survsquirrel.world.TiledGameMap;
  */
 public class GameScreen implements Screen, ChangeMapEvent{
 	
+	float delta;
+	
 	private GameHud hud;
+	private FitViewport fitViewport;
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
 	private static final float SMACK_WAIT_TIME = 0.4f;
@@ -81,10 +86,12 @@ public class GameScreen implements Screen, ChangeMapEvent{
 	public Color tint;
 
 	public GameScreen(final Principal pr) {
-		batch = new SpriteBatch();
+		this.pr = pr;
+		batch = pr.batch;
+		fitViewport = pr.fitViewport;
+		
 		inputM = new InputManager();
 		Gdx.input.setInputProcessor(inputM);
-		this.pr = pr;
 
 		tint = new Color(Color.WHITE);
 
@@ -122,11 +129,12 @@ public class GameScreen implements Screen, ChangeMapEvent{
 
 	@Override
 	public void show() {
+		
 		// TODO Auto-generated method stub
 		System.out.println("Empezar Juego");
 
-		w = Gdx.graphics.getWidth()*0.5f;
-		h = Gdx.graphics.getHeight()*0.5f;
+		w = 640;
+		h = 360;
 
 		cam = new OrthographicCamera();
 		cam.setToOrtho(false, w, h);
@@ -151,10 +159,15 @@ public class GameScreen implements Screen, ChangeMapEvent{
 	}
 
 	@Override
-	public void render(float delta) {
+	public void render(float deltaTime) {
+		
+		fitViewport.apply();
+		
+		batch.setProjectionMatrix(fitViewport.getCamera().combined);
+		
+		delta = Math.min(1/16f, deltaTime);
 		
 		if (inputM.isKeyReleased(Input.Keys.P)) {
-			cam.setToOrtho(false);
 			pr.setScreen(new MainMenuScreen(pr));
 			this.dispose();
 		}
@@ -172,7 +185,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		}
 
 		cam.update();
-		batch.setProjectionMatrix(cam.combined);
+//		batch.setProjectionMatrix(cam.combined);
 
 		//-------------------------------------------------------------------------
 
@@ -198,7 +211,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		
 		batch.begin();
 
-		batch.draw(bg, cam.position.x-w/2, cam.position.y-h/2, w, h);
+		batch.draw(bg, fitViewport.getCamera().position.x - w, fitViewport.getCamera().position.y - h, w*2, h*2);
 
 		batch.end();
 
@@ -287,56 +300,61 @@ public class GameScreen implements Screen, ChangeMapEvent{
 //		}
 		
 		for (Enemy e : enemies) {
+			
+			if (e.gotRemoved()) {
+				enemiesToRemove.add(e);
+			}	
 
 			if (e instanceof EnemyRat) {
-				if (e.isAwaken()) {
-//					if (inputM.isKeyPressed(Input.Keys.K)) {
-//						bullets.add(new Bullet(e, this, 2, true));
-//					}
+				EnemyRat er = (EnemyRat) e;
+				if (er.isAwaken()) {
+					if (inputM.isKeyPressed(Input.Keys.K)) {
+						bullets.add(new Bullet(er, this, 2, true));
+					}
 //
 //					if (inputM.isKeyPressed(Input.Keys.M)) {
 //						System.out.println(e.checkDistance(p));
 //					}
 
-					if (e.gotRemoved()) {
-						enemiesToRemove.add(e);
+					if (er.gotRemoved()) {
+						enemiesToRemove.add(er);
 					}	
 					
 //					System.out.println(Math.round(e.checkDistanceLR(p)));
 					
-					if (Math.round(e.checkDistanceLR(p)) < -20) {
-						((EnemyRat)e).walkToLeft(delta);
+					if (Math.round(er.checkDistanceLR(p)) < -20) {
+						er.walkToLeft(delta);
 					}
-					else if (Math.round(e.checkDistanceLR(p)) > 20) {
-						((EnemyRat)e).walkToRight(delta);
+					else if (Math.round(er.checkDistanceLR(p)) > 20) {
+						er.walkToRight(delta);
 					}
 					
 					else {
-						((EnemyRat)e).moving = false;
+						er.moving = false;
 					}
 					
-//					System.out.println(((EnemyRat)e).isMoving());
+//					System.out.println(er.isMoving());
 					
 					if (p.getPos().y > e.getPos().y) {
 						if (rg.genRandomInt(1, 20) == 1) {
-							((EnemyRat)e).jump();
+							er.jump();
 						}
 					}
 					
-					if (((EnemyRat)e).isMoving()){
+					if (er.isMoving()){
 						if (rg.genRandomInt(1, 200) == 1) {
-							((EnemyRat)e).jump();
+							er.jump();
 						}
 					}
 
-					if (e.checkDistanceTiles(p) >= 35) {
-						e.backToSleep();
+					if (er.checkDistanceTiles(p) >= 35) {
+						er.backToSleep();
 					}
 
 				}
 				else {
-					if (e.checkDistanceTiles(p) <= 4) {
-						e.wakeUp();
+					if (er.checkDistanceTiles(p) <= 4) {
+						er.wakeUp();
 					}
 				}
 			}
@@ -452,6 +470,8 @@ public class GameScreen implements Screen, ChangeMapEvent{
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
 
+		fitViewport.update(width, height, true);
+		
 		//		System.out.println("Cambio de Tamaño de Ventana");
 	}
 

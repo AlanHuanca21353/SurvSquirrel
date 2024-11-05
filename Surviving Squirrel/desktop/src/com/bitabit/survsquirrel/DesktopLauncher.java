@@ -11,7 +11,7 @@ public class DesktopLauncher {
 		config.setTitle("Surviving Squirrel");
 		config.setWindowedMode(1280, 720);
 		config.setWindowIcon("imagenes/icon.png");
-		config.setResizable(false);
+		config.setResizable(true);
 		new Lwjgl3Application(new Principal(), config);
 	}
 }

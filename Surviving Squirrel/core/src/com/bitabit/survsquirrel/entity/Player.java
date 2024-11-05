@@ -273,6 +273,9 @@ public class Player extends Entity {
 			}
 
 			if (hit) {
+				
+				movingLeft = movingRight = jumping = false;
+				
 				ouchTimer += deltaTime;
 				dontWalk = true;
 				dontJump = true;

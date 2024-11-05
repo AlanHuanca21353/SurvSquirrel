@@ -5,6 +5,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.bitabit.survsquirrel.Principal;
 import com.bitabit.survsquirrel.hud.MenuHud;
 
@@ -15,6 +17,8 @@ public class MainMenuScreen implements Screen{
 	private static final int EXIT_BUTTON_Y = 50, PLAY_BUTTON_Y = 125, TITLE_Y = 230;
 	
 	final Principal pr;
+	
+	ScreenViewport screenViewport;
 	
 	MenuHud mHud;
 	
@@ -31,6 +35,8 @@ public class MainMenuScreen implements Screen{
 	public MainMenuScreen(final Principal pr) {
 		
 		this.pr = pr;
+		
+		screenViewport = pr.screenViewport;
 		
 		gameTitle = new Texture("imagenes/title.png");
 		
@@ -57,6 +63,10 @@ public class MainMenuScreen implements Screen{
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(0.4f, 0.4f, 0.4f, 1);
+		
+		screenViewport.apply();
+		
+		pr.batch.setProjectionMatrix(screenViewport.getCamera().combined);
 		
 		pr.batch.begin();
 		
@@ -96,7 +106,7 @@ public class MainMenuScreen implements Screen{
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
+		screenViewport.update(width, height, true);
 		
 	}
 
