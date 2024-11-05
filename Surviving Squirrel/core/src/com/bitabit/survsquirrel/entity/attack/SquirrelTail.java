@@ -23,7 +23,12 @@ public class SquirrelTail extends Attack {
 	public SquirrelTail(Entity e, GameScreen gS, float power) {
 		this(e.getAtkStartX(), e.getY(), gS, power, e.getDirX());
 		
-		this.e = e;
+		if (e.getDirX() == Direcciones.LEFT) {
+			pos.x -= 30;
+		}
+		else {
+			pos.x += 30;
+		}
 		
 	}
 	

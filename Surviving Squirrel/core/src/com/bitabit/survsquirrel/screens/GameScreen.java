@@ -287,6 +287,9 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		}
 		
 		if (inputM.isKeyPressed(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME) {
+			
+			smackDelayTimer = 0f;
+			
 			tails.add(new SquirrelTail(p, this, 1.5f));
 			System.out.println("Agregar Cola");
 		}
@@ -405,7 +408,12 @@ public class GameScreen implements Screen, ChangeMapEvent{
 				t.setDirX(p.getDirX());
 			}
 			
-			t.setX(p.getAtkStartX());
+			if (t.getDirX() == Direcciones.LEFT) {
+				t.setX(p.getAtkStartX()-20);	
+			}
+			else {
+				t.setX(p.getAtkStartX()+20);	
+			}
 			
 			for (Enemy e : enemies) {
 				if (t.collide(e) && !e.gotHit()){

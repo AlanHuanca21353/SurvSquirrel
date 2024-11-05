@@ -20,9 +20,12 @@ public class Player extends Entity {
 
 	private static final float SHOOT_WAIT_TIME = 0.4f;
 
-	private static final float SMACK_WAIT_TIME = 0.4f;
+	private static final float SMACK_WAIT_TIME = 0.25f;
 	
 	private static final int SPEED = 160;
+	
+	private static float speedMultiplier = 1f;
+	
 	private static final int RUN_SPEED = 240;
 	private static final int JUMP_VELOCITY = 4;
 
@@ -35,7 +38,8 @@ public class Player extends Entity {
 	TextureRegion[] animationFrames;
 	
 	Animation<TextureRegion> walkAnimation, jumpAnimation, 
-	fallAnimation, chargeAnimation, hurtAnimation;
+	fallAnimation, chargeAnimation, hurtAnimation,
+	smackAnimation;
 
 	float shootTimer, shootDelayTimer, 
 	smackTimer, smackDelayTimer, atkStartX;
@@ -75,6 +79,7 @@ public class Player extends Entity {
 		fallAnimation = animM.genEntAnimation(8, fallImage, this, 2);
 		chargeAnimation = animM.genEntAnimation(2, chargeImage, this, 4, 2, 2);
 		hurtAnimation = animM.genEntAnimation(12, hurtImage, this, 2);
+		smackAnimation = animM.genEntAnimation(24, smackImage, this, 4, 2, 2);
 		
 		this.camFollow = camFollow;
 		
@@ -159,15 +164,6 @@ public class Player extends Entity {
 					chargingShot = false;
 					shooting = true;
 				}
-				
-				if (inputManager.isKeyDown(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME) {
-					smackDelayTimer = 0f;
-					
-					audioM.playSound(slingShotSound, 0.6f, 0.5f, 0.7f);
-					
-					smacking = true;
-					
-				}
 
 				if (jumping) { // Salto inicial
 					this.velocityY += JUMP_VELOCITY * getWeight();
@@ -182,7 +178,19 @@ public class Player extends Entity {
 				// Si mantenes pulsado despues de saltar, saltas mas alto.
 				if (jumping && this.velocityY > 0) {
 					this.velocityY += JUMP_VELOCITY * getWeight() * deltaTime;
+					
+					newAnimState = AnimationState.JUMPING;
+					
 				}
+			}
+			
+			if (inputManager.isKeyPressed(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME) {
+				smackDelayTimer = 0f;
+				
+				audioM.playSound(slingShotSound, 0.6f, 0.5f, 0.7f);
+				
+				smacking = true;
+				
 			}
 
 			if (!dontWalk) { // Si se permite caminar
@@ -224,11 +232,18 @@ public class Player extends Entity {
 			}
 			
 			if (smacking) {
+				if (grounded) {
+					speedMultiplier = 0.7f;	
+				}
+				else {
+					speedMultiplier = 1f;
+				}
 				smackTimer += deltaTime;
 				newAnimState = AnimationState.SMACK;
-				if (smackTimer >= 0.3f) {
+				if (smackTimer >= 0.16f) {
 					smackTimer = 0f;
 					smacking = false;
+					speedMultiplier = 1f;
 				}
 				
 			}
@@ -236,10 +251,10 @@ public class Player extends Entity {
 			// Mover
 			if (movingLeft && !hit) { // Mover Izquierda
 				if (inputManager.isKeyDown(Input.Keys.SHIFT_LEFT)) {
-					moveX(-RUN_SPEED * deltaTime);
+					moveX(-RUN_SPEED * deltaTime * speedMultiplier);
 				}
 				else {
-					moveX(-SPEED * deltaTime);	
+					moveX(-SPEED * deltaTime * speedMultiplier);	
 				}
 
 				this.dirX = Direcciones.LEFT;
@@ -252,10 +267,10 @@ public class Player extends Entity {
 
 			if (movingRight && !hit) { // Mover Derecha
 				if (inputManager.isKeyDown(Input.Keys.SHIFT_LEFT)) {
-					moveX(RUN_SPEED * deltaTime);
+					moveX(RUN_SPEED * deltaTime * speedMultiplier);
 				}
 				else {
-					moveX(SPEED * deltaTime);	
+					moveX(SPEED * deltaTime * speedMultiplier);	
 				}
 
 				this.dirX = Direcciones.RIGHT;
@@ -358,7 +373,7 @@ public class Player extends Entity {
 			break;
 		
 		case SMACK:
-			animM.drawStaticSprite(batch, smackImage, this);
+			animM.drawAnimSprite(batch, smackAnimation, this, false);
 			break;
 			
 		}
