@@ -16,21 +16,23 @@ public class MainMenuScreen implements Screen{
 	private static final int TITLE_WIDTH=709, TITLE_HEIGHT=475;
 	private static final int EXIT_BUTTON_Y = 50, PLAY_BUTTON_Y = 125, TITLE_Y = 230;
 	
-	final Principal pr;
+	private final Principal pr;
 	
-	ScreenViewport screenViewport;
+	private Texture bg = new Texture("imagenes/blur.png");
 	
-	MenuHud mHud;
+	private ScreenViewport screenViewport;
 	
-	Texture gameTitle;
+//	private MenuHud mHud;
 	
-	Texture playButtonActive;
-	Texture playButtonInactive;
+	private Texture gameTitle;
 	
-	Texture exitButtonActive;
-	Texture exitButtonInactive;
+	private Texture playButtonActive;
+	private Texture playButtonInactive;
 	
-	InputMultiplexer multiplexer = new InputMultiplexer();
+	private Texture exitButtonActive;
+	private Texture exitButtonInactive;
+	
+//	private InputMultiplexer multiplexer = new InputMultiplexer();
 	
 	public MainMenuScreen(final Principal pr) {
 		
@@ -52,12 +54,12 @@ public class MainMenuScreen implements Screen{
 		// TODO Auto-generated method stub
 		System.out.println("Iniciar Menu Principal");
 		
-		mHud = new MenuHud();
+//		mHud = new MenuHud();
 		
-		multiplexer.addProcessor(mHud.getStage());
-		multiplexer.addProcessor(mHud.getStage());
+//		multiplexer.addProcessor(mHud.getStage());
+//		multiplexer.addProcessor(mHud.getStage());
 		
-		Gdx.input.setInputProcessor(multiplexer);
+//		Gdx.input.setInputProcessor(multiplexer);
 	}
 
 	@Override
@@ -69,6 +71,8 @@ public class MainMenuScreen implements Screen{
 		pr.batch.setProjectionMatrix(screenViewport.getCamera().combined);
 		
 		pr.batch.begin();
+		
+		pr.batch.draw(bg, Gdx.graphics.getWidth()/2-640, Gdx.graphics.getHeight()/2-360, 1280, 720);
 		
 		int exitX = Gdx.graphics.getWidth()/2 - EXIT_BUTTON_WIDTH/2;
 		int exitY = EXIT_BUTTON_Y;
@@ -87,7 +91,7 @@ public class MainMenuScreen implements Screen{
 		
 		pr.batch.end();
 		
-		mHud.dibujar();
+//		mHud.dibujar();
 		
 	}
 	

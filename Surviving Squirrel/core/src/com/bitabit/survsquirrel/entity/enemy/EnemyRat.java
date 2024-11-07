@@ -25,11 +25,11 @@ public class EnemyRat extends Enemy {
 
 	InputManager inputManager;
 
-	Texture idleImage, hurtImage, veryHurtImage, sleepImage;
+	Texture idleImage, hurtImage, veryHurtImage, sleepImage, jumpImage;
 	Sprite sprite;
 	Sound jumpSound, walkSound;
 
-	Animation<TextureRegion> hurtAnimation;
+	Animation<TextureRegion> hurtAnimation, veryHurtAnimation;
 
 	private boolean movingRight, movingLeft;
 	public boolean moving;
@@ -47,8 +47,10 @@ public class EnemyRat extends Enemy {
 		hurtImage = new Texture("imagenes/rat_ouch.png");
 		veryHurtImage = new Texture("imagenes/rat_bigouch.png");
 		sleepImage = new Texture("imagenes/rat_sleep.png");
+		jumpImage = new Texture("imagenes/rat_jump.png");
 
 		hurtAnimation = animM.genEntAnimation(12, hurtImage, this, 2);
+		veryHurtAnimation = animM.genEntAnimation(12, veryHurtImage, this, 2);
 
 		inputManager = gameScreen.inputM;
 
@@ -77,17 +79,28 @@ public class EnemyRat extends Enemy {
 		jumpDelayTimer += deltaTime;
 
 		if (awaken) {
+			
+			if (jumping) {
+				newAnimState = AnimationState.JUMPING;
+			}
+			
+			if (velocityY <= 0) {
+				jumping = false;
+			}
 
 			if (grounded) { // Si estás en el suelo
+				
 				if (!hit) {
 					newAnimState = AnimationState.IDLE;	
 				}
+				
 			}
 			else { // Si estás en el aire
 
 				// Si mantenes pulsado despues de saltar, saltas mas alto.
 				if (jumping && this.velocityY > 0 && !dontJump) {
 					this.velocityY += JUMP_VELOCITY * getWeight() * deltaTime;
+					
 				}
 			}	
 		}
@@ -153,13 +166,17 @@ public class EnemyRat extends Enemy {
 		case IDLE:
 			animM.drawStaticSprite(batch, idleImage, this);
 			break;
+			
+		case JUMPING:
+			animM.drawStaticSprite(batch, jumpImage, this);
+			break;
 
 		case HURT:
 			animM.drawAnimSprite(batch, hurtAnimation, this, false);
 			break;
 
 		case VERYHURT:
-			animM.drawStaticSprite(batch, veryHurtImage, this);
+			animM.drawAnimSprite(batch, veryHurtAnimation, this, false);
 			break;
 
 		case SLEEPING:
@@ -209,9 +226,19 @@ public class EnemyRat extends Enemy {
 	public void jump() {
 		if (jumpDelayTimer > 1f) {
 			if (!dontJump) {
+				
+				System.out.println("Jump");
+				
+				jumping = true;
+				
+				newAnimState = AnimationState.JUMPING;
+				System.out.println(animState);
+				System.out.println(animState);
+				
 				this.velocityY += JUMP_VELOCITY * getWeight();
 
 				audioM.playSound(jumpSound, 0.5f, 0.65f, 0.85f);
+				
 			}	
 			
 			jumpDelayTimer = 0f;
