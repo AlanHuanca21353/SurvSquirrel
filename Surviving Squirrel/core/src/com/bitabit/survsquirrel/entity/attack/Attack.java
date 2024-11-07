@@ -17,7 +17,7 @@ public abstract class Attack extends Entity {
 		
 		this.power = power;
 		
-		dmg = 10*(power+1);
+		dmg = 10*(Math.round(power)+1);
 		
 		// TODO Auto-generated constructor stub
 	}

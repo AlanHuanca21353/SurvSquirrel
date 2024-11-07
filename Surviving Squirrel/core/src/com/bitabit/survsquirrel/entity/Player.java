@@ -77,7 +77,7 @@ public class Player extends Entity {
 		walkAnimation = animM.genEntAnimation(12, walkImage, this, 4, 2, 2);
 		jumpAnimation = animM.genEntAnimation(12, jumpImage, this , 4, 2, 2);
 		fallAnimation = animM.genEntAnimation(8, fallImage, this, 2);
-		chargeAnimation = animM.genEntAnimation(2, chargeImage, this, 4, 2, 2);
+		chargeAnimation = animM.genEntAnimation(12, chargeImage, this, 16, 4, 4);
 		hurtAnimation = animM.genEntAnimation(12, hurtImage, this, 2);
 		smackAnimation = animM.genEntAnimation(24, smackImage, this, 4, 2, 2);
 		

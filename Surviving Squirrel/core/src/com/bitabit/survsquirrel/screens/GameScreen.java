@@ -197,7 +197,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		shootDelayTimer += delta;
 		smackDelayTimer += delta;
 
-		if (chargeTimer < 2 && charging) {
+		if (chargeTimer < 2.5f && charging) {
 			chargeTimer += delta;
 		}
 
@@ -280,7 +280,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		if (p.isShooting() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Disparar
 			shootDelayTimer = 0f;
 			if (p.isGrounded() && !p.isDead()) {
-				bullets.add(new Bullet(p, this, Math.round(chargeTimer)));
+				bullets.add(new Bullet(p, this, chargeTimer));
 			}
 			chargeTimer = 0f;
 			charging = false;

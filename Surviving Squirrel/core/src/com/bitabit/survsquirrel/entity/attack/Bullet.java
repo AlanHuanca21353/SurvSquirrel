@@ -35,11 +35,27 @@ public class Bullet extends Attack {
 	}
 	
 	public Bullet(Entity e, GameScreen gS, float power) {
-		this(e.getAtkStartX(), e.getY()+20, gS, power, e.getDirX());
+		this(e.getAtkStartX(), e.getY()+15, gS, power, e.getDirX());
+		
+		if (e.getDirX() == Direcciones.LEFT) {
+			pos.x -= 10;
+		}
+		else {
+			pos.x += 25;
+		}
+		
 	}
 	
 	public Bullet(Entity e, GameScreen gS, float power, boolean hurtPlayer) {
 		this(e.getAtkStartX(), e.getY()+20, gS, power, e.getDirX(), hurtPlayer);
+		
+		if (e.getDirX() == Direcciones.LEFT) {
+			pos.x -= 10;
+		}
+		else {
+			pos.x += 25;
+		}
+		
 	}
 
 	public void update(float deltaTime, float gravity) {
