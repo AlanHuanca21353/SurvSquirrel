@@ -12,7 +12,7 @@ public class GameHud implements HeadsUpDisplay{
 	private Stage stage;
 	private ScreenViewport vw;
 	private Table tabla, contenedor;
-	private Label hpTag;
+	private Label hpTag, ratTag;
 	private Label etiqueta2;
 	private Table mostrarVida;
 	private Label mostrarVidaE;
@@ -37,6 +37,7 @@ public class GameHud implements HeadsUpDisplay{
 		tabla.setFillParent(true);
 		contenedor = new Table();
 		hpTag = new Label("HP: ", estiloFuente);
+		ratTag = new Label ("Ratas: ", estiloFuente);
 		etiqueta2 = new Label("Etiqueta Peligro", estiloPeligro);
 		
 	}
@@ -46,6 +47,7 @@ public class GameHud implements HeadsUpDisplay{
 		stage.addActor(tabla);
 		tabla.add(contenedor).size(1200,680);
 		contenedor.add(hpTag).expand().top().left();
+		contenedor.add(ratTag).expand().top().left();
 	}
 
 	@Override
@@ -65,6 +67,10 @@ public class GameHud implements HeadsUpDisplay{
 	
 	public void setLabel(String txt) {
 		hpTag.setText(txt);
+	}
+	
+	public void setLabelRat(String txt) {
+		ratTag.setText(txt);
 	}
 	
 	public void setLabel(String txt, int num) {

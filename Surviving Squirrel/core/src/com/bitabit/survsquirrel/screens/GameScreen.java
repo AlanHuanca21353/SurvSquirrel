@@ -84,6 +84,8 @@ public class GameScreen implements Screen, ChangeMapEvent{
 	public float w, h;
 
 	public Color tint;
+	
+	public int ratCount = 20;
 
 	public GameScreen(final Principal pr) {
 		this.pr = pr;
@@ -167,7 +169,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		
 		delta = Math.min(1/16f, deltaTime);
 		
-		if (inputM.isKeyReleased(Input.Keys.P)) {
+		if (inputM.isKeyReleased(Input.Keys.ESCAPE)) {
 			pr.setScreen(new MainMenuScreen(pr));
 			this.dispose();
 		}
@@ -237,41 +239,38 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		// [Game Logic]
 		//-------------------------------------------------------------------------
 
-		if (inputM.isKeyReleased(Input.Keys.V)) {
-			collisionLayer.setVisible(!collisionLayer.isVisible());
-		}
+//		if (inputM.isKeyReleased(Input.Keys.V)) {
+//			collisionLayer.setVisible(!collisionLayer.isVisible());
+//		}
+//
+//		if (inputM.isKeyReleased(Input.Keys.E)) {
+//			entitiesLayer.setVisible(!entitiesLayer.isVisible());
+//		}
 
-		if (inputM.isKeyReleased(Input.Keys.E)) {
-			entitiesLayer.setVisible(!entitiesLayer.isVisible());
-		}
 
+//		if (inputM.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
+//			for (Enemy e : enemies) {
+//				e.ouch(9999f);
+//
+//				if (e.gotRemoved()) {
+//					enemiesToRemove.add(e);
+//				}
+//
+//			}
+//		}
 
-		if (inputM.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos
-			for (Enemy e : enemies) {
-				e.ouch(9999f);
-
-				if (e.gotRemoved()) {
-					enemiesToRemove.add(e);
-				}
-
-			}
-		}
-
-		if (inputM.isKeyReleased(Input.Keys.NUM_1)) { // Mapa 1
+		if (inputM.isKeyReleased(Input.Keys.R)) { // Mapa 1
+			
+			ratCount = 20;
+			
 			Listeners.executeMapChange(1);
 			tint.set(Color.WHITE);
 
 		}
 
-		if (inputM.isKeyReleased(Input.Keys.NUM_2)) { // Mapa 2
-			Listeners.executeMapChange(2);
-			tint.set(0.5f, 0.5f, 0.85f, 1f);
-		}
-
-
-		if (inputM.isKeyReleased(Input.Keys.NUM_5)) { // Spawnear Rata
-			enemies.add(new EnemyRat(p.getX()+70, p.getY()+100, this));
-		}
+//		if (inputM.isKeyReleased(Input.Keys.NUM_5)) { // Spawnear Rata
+//			enemies.add(new EnemyRat(p.getX()+70, p.getY()+100, this));
+//		}
 
 		if (p.isChargingShot() && shootDelayTimer >= SHOOT_WAIT_TIME && !p.isMoving()) { // Cargar disparo
 			charging = true;
@@ -311,17 +310,14 @@ public class GameScreen implements Screen, ChangeMapEvent{
 			if (e instanceof EnemyRat) {
 				EnemyRat er = (EnemyRat) e;
 				if (er.isAwaken()) {
-					if (inputM.isKeyPressed(Input.Keys.K)) {
-						bullets.add(new Bullet(er, this, 2, true));
-					}
 					
 					if (er.spawnHitbox) {
-						System.out.println("a");
 						tails.add(new SquirrelTail(er, this, 2, true));
 						er.spawnHitbox = false;
 					}
 
 					if (er.gotRemoved()) {
+						ratCount--;
 						enemiesToRemove.add(er);
 					}	
 					
@@ -478,6 +474,8 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		//-------------------------------------------------------------------------
 
 		//		System.out.println("Juego Siempre");
+		
+		hud.setLabelRat("Ratas: " + ratCount + "/20");
 		
 		hud.setLabel("HP: ", (int) p.getHP());
 		

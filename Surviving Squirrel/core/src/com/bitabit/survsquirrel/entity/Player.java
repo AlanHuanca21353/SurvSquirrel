@@ -345,9 +345,9 @@ public class Player extends Entity {
 		else {
 			newAnimState = AnimationState.DEAD;
 			
-			if (inputManager.isKeyPressed(Input.Keys.Q)) {
-				revive();
-			}
+//			if (inputManager.isKeyPressed(Input.Keys.Q)) {
+//				revive();
+//			}
 			
 		}
 		super.update(deltaTime, gravity); // Aplicar gravedad.
@@ -456,8 +456,7 @@ public class Player extends Entity {
 	
 	public void revive() {
 		System.out.println("Volvió a la vida");
-	
-		audioM.playSound(reviveSound);
+		
 		hp = 100;
 		dead = false;
 	
