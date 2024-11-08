@@ -25,11 +25,12 @@ public class EnemyRat extends Enemy {
 
 	InputManager inputManager;
 
-	Texture idleImage, hurtImage, veryHurtImage, sleepImage, jumpImage;
+	Texture idleImage, hurtImage, veryHurtImage, sleepImage, jumpImage,
+	fallImage, walkImage;
 	Sprite sprite;
 	Sound jumpSound, walkSound;
 
-	Animation<TextureRegion> hurtAnimation, veryHurtAnimation;
+	Animation<TextureRegion> hurtAnimation, veryHurtAnimation, walkAnimation;
 
 	private boolean movingRight, movingLeft;
 	public boolean moving;
@@ -48,9 +49,12 @@ public class EnemyRat extends Enemy {
 		veryHurtImage = new Texture("imagenes/rat_bigouch.png");
 		sleepImage = new Texture("imagenes/rat_sleep.png");
 		jumpImage = new Texture("imagenes/rat_jump.png");
+		fallImage = new Texture("imagenes/rat_fall.png");
+		walkImage = new Texture("imagenes/rat_walk.png");
 
 		hurtAnimation = animM.genEntAnimation(12, hurtImage, this, 2);
 		veryHurtAnimation = animM.genEntAnimation(12, veryHurtImage, this, 2);
+		walkAnimation = animM.genEntAnimation(8, walkImage, this, 4, 2, 2);
 
 		inputManager = gameScreen.inputM;
 
@@ -90,12 +94,16 @@ public class EnemyRat extends Enemy {
 
 			if (grounded) { // Si estás en el suelo
 				
-				if (!hit) {
+				if (!hit && !moving) {
 					newAnimState = AnimationState.IDLE;	
 				}
 				
 			}
 			else { // Si estás en el aire
+				
+				if (!jumping) {
+					newAnimState = AnimationState.FALLING;
+				}
 
 				// Si mantenes pulsado despues de saltar, saltas mas alto.
 				if (jumping && this.velocityY > 0 && !dontJump) {
@@ -183,6 +191,13 @@ public class EnemyRat extends Enemy {
 			animM.drawStaticSprite(batch, sleepImage, this);
 			break;
 			
+		case FALLING:
+			animM.drawStaticSprite(batch, fallImage, this);
+			break;
+			
+		case WALKING:
+			animM.drawAnimSprite(batch, walkAnimation, this, true);
+			
 		}
 		
 		batch.setColor(Color.WHITE);
@@ -208,6 +223,7 @@ public class EnemyRat extends Enemy {
 		if (!hit && !dontWalk) {
 			moveX(-SPEED * delta);	
 			this.dirX = Direcciones.LEFT;
+			newAnimState = AnimationState.WALKING;
 		}
 		
 		if (!moving) { moving = true; }
@@ -218,6 +234,7 @@ public class EnemyRat extends Enemy {
 		if (!hit && !dontWalk) {
 			moveX(SPEED * delta);
 			this.dirX = Direcciones.RIGHT;
+			newAnimState = AnimationState.WALKING;
 		}
 		
 		if (!moving) { moving = true; }

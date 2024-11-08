@@ -286,11 +286,11 @@ public class GameScreen implements Screen, ChangeMapEvent{
 			charging = false;
 		}
 		
-		if (inputM.isKeyPressed(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME) {
+		if (p.isSmacking() && smackDelayTimer >= SMACK_WAIT_TIME) {
 			
 			smackDelayTimer = 0f;
 			
-			tails.add(new SquirrelTail(p, this, 1.5f));
+			tails.add(new SquirrelTail(p, this, 0.5f));
 			System.out.println("Agregar Cola");
 		}
 		
