@@ -12,11 +12,21 @@ public class SquirrelTail extends Attack {
 	Entity e;
 	
 	private Direcciones dirX;
+	
+	public boolean hurtPlayer = false;
+	
 
 	public SquirrelTail(float x, float y, GameScreen gS, float power, Direcciones dirX) {
 		super(x, y, EntityType.SQUIRRELTAIL, gS, power);
 		
 		this.dirX = dirX;
+		
+	}
+	
+	public SquirrelTail(float x, float y, GameScreen gS, float power, Direcciones dirX, boolean hurtPlayer) {
+		this(x, y, gS, power, dirX);
+		
+		this.hurtPlayer = hurtPlayer;
 		
 	}
 	
@@ -32,12 +42,24 @@ public class SquirrelTail extends Attack {
 		
 	}
 	
+	public SquirrelTail(Entity e, GameScreen gS, float power, boolean hurtPlayer) {
+		this(e.getAtkStartX(), e.getY(), gS, power, e.getDirX(), hurtPlayer);
+		
+		if (e.getDirX() == Direcciones.LEFT) {
+			pos.x -= 30;
+		}
+		else {
+			pos.x += 30;
+		}
+		
+	}
+	
 	public void update (float deltaTime) {
 		tailTime += deltaTime;
 		
 		if (tailTime >= 0.25f) {
 			remove = true;
-			System.out.println("Chau hitbox cola");
+			System.out.println("Chau");
 		}
 		
 		super.update(deltaTime, 0f);

@@ -314,10 +314,12 @@ public class GameScreen implements Screen, ChangeMapEvent{
 					if (inputM.isKeyPressed(Input.Keys.K)) {
 						bullets.add(new Bullet(er, this, 2, true));
 					}
-//
-//					if (inputM.isKeyPressed(Input.Keys.M)) {
-//						System.out.println(e.checkDistance(p));
-//					}
+					
+					if (er.spawnHitbox) {
+						System.out.println("a");
+						tails.add(new SquirrelTail(er, this, 2, true));
+						er.spawnHitbox = false;
+					}
 
 					if (er.gotRemoved()) {
 						enemiesToRemove.add(er);
@@ -325,39 +327,43 @@ public class GameScreen implements Screen, ChangeMapEvent{
 					
 //					System.out.println(Math.round(e.checkDistanceLR(p)));
 					
-					if (Math.round(er.checkDistanceLR(p)) < -20) {
+					if (Math.round(er.checkDistanceLR(p)) < -30) {
 						er.walkToLeft(delta);
 					}
-					else if (Math.round(er.checkDistanceLR(p)) > 20) {
+					else if (Math.round(er.checkDistanceLR(p)) > 30) {
 						er.walkToRight(delta);
 					}
-					
 					else {
 						er.moving = false;
+						if (er.isGrounded() && p.getPos().y == e.getPos().y && !p.isDead()) {
+							er.attacking = true;	
+						}
 					}
 					
 //					System.out.println(er.isMoving());
 					
 					if (p.getPos().y > e.getPos().y) {
-						if (rg.genRandomInt(1, 20) == 1) {
+						if (rg.genRandomInt(1, 100) == 1) {
 							er.jump();
 						}
 					}
 					
 					if (er.isMoving()){
-						if (rg.genRandomInt(1, 200) == 1) {
+						if (er.getVelX() == 0) {
 							er.jump();
 						}
 					}
 
-					if (er.checkDistanceTiles(p) >= 35) {
+					if (er.checkDistanceTiles(p) >= 35 || p.getPos().y > er.getPos().y + 200) {
 						er.backToSleep();
 					}
 
 				}
 				else {
-					if (er.checkDistanceTiles(p) <= 4) {
-						er.wakeUp();
+					if (er.checkDistanceTiles(p) <= 8) {
+						if (er.getPos().y > p.getPos().y - 5 && er.getPos().y < p.getPos().y + 10) {
+							er.wakeUp();	
+						}
 					}
 				}
 			}
@@ -383,7 +389,7 @@ public class GameScreen implements Screen, ChangeMapEvent{
 				}
 			}
 
-			if (b.hurtPlayer && !p.isDead()) {
+			if (b.hurtPlayer && !p.isDead() && !p.gotHit()) {
 				if (b.collide(p)) {
 					//					System.out.println("Ardilla: Ouch!");
 
@@ -408,22 +414,31 @@ public class GameScreen implements Screen, ChangeMapEvent{
 				t.setDirX(p.getDirX());
 			}
 			
-			if (t.getDirX() == Direcciones.LEFT) {
-				t.setX(p.getAtkStartX()-20);	
-			}
-			else {
-				t.setX(p.getAtkStartX()+20);	
+			if (!t.hurtPlayer) {
+				if (t.getDirX() == Direcciones.LEFT) {
+					t.setX(p.getAtkStartX()-25);	
+				}
+				else {
+					t.setX(p.getAtkStartX()+25);	
+				}	
 			}
 			
 			for (Enemy e : enemies) {
-				if (t.collide(e) && !e.gotHit()){
-					//						System.out.println("Ouch!");
+				if (!t.hurtPlayer) {
+					if (t.collide(e) && !e.gotHit()){
+						e.bigOuch(t.getDmg(), t.getDirX());
 
-					System.out.println("¡Pegaste con la cola!");
-					
-					e.bigOuch(t.getDmg(), t.getDirX());
+					}		
+				}
+			}
+			
+			if (t.hurtPlayer && !p.isDead() && !p.isInvincible()) {
+				if (t.collide(p) && !p.gotHit()) { // Ardilla es Golpeada
 
-				}	
+					p.bigOuch(15f, t.getDirX());
+
+					t.remove = true;
+				}
 			}
 			
 			

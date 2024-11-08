@@ -24,6 +24,10 @@ public abstract class Entity {
 	protected float velocityY = 0;
 	protected GameScreen gameScreen;
 	protected boolean grounded = false;
+	
+	private float lastPosX;
+
+	protected float velX;
 
 	protected Direcciones dirX, dirY;
 
@@ -53,6 +57,9 @@ public abstract class Entity {
 	}
 
 	public void update(float deltaTime, float gravity) {
+		
+		velX = pos.x-lastPosX;
+		lastPosX = pos.x;
 		
 		if (getDirX() == Direcciones.LEFT) {
 			atkStartX = getX() + getLeftBoundary();	
@@ -267,6 +274,10 @@ public abstract class Entity {
 
 	public boolean gotRemoved() {
 		return remove;
+	}
+	
+	public float getVelX() {
+		return velX;
 	}
 
 

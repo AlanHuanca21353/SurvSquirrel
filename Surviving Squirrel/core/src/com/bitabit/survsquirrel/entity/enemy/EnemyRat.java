@@ -26,35 +26,41 @@ public class EnemyRat extends Enemy {
 	InputManager inputManager;
 
 	Texture idleImage, hurtImage, veryHurtImage, sleepImage, jumpImage,
-	fallImage, walkImage;
+	fallImage, walkImage, punchImage, windupImage;
 	Sprite sprite;
 	Sound jumpSound, walkSound;
 
-	Animation<TextureRegion> hurtAnimation, veryHurtAnimation, walkAnimation;
+	Animation<TextureRegion> hurtAnimation, veryHurtAnimation, walkAnimation,
+	punchAnimation, windupAnimation;
 
 	private boolean movingRight, movingLeft;
 	public boolean moving;
 	private boolean jumping;
+	public boolean attacking = false, spawnHitbox = false;
 	private boolean dontWalk = false;
 	private boolean dontJump = false;
-	private float count, jumpDelayTimer;
+	private float count, jumpDelayTimer, atkWindUp, atkTimer;
 
 	public EnemyRat(float x, float y, GameScreen gameScreen) {
 		super(x, y, EntityType.ENEMYRAT, gameScreen);
 
 		rg = gameScreen.rg;
 
-		idleImage = new Texture("imagenes/rat.png");
-		hurtImage = new Texture("imagenes/rat_ouch.png");
-		veryHurtImage = new Texture("imagenes/rat_bigouch.png");
-		sleepImage = new Texture("imagenes/rat_sleep.png");
-		jumpImage = new Texture("imagenes/rat_jump.png");
-		fallImage = new Texture("imagenes/rat_fall.png");
-		walkImage = new Texture("imagenes/rat_walk.png");
+		idleImage = new Texture("imagenes/rat/rat.png");
+		hurtImage = new Texture("imagenes/rat/rat_ouch.png");
+		veryHurtImage = new Texture("imagenes/rat/rat_bigouch.png");
+		sleepImage = new Texture("imagenes/rat/rat_sleep.png");
+		jumpImage = new Texture("imagenes/rat/rat_jump.png");
+		fallImage = new Texture("imagenes/rat/rat_fall.png");
+		walkImage = new Texture("imagenes/rat/rat_walk.png");
+		punchImage = new Texture("imagenes/rat/rat_punch.png");
+		windupImage = new Texture("imagenes/rat/rat_windup.png");
 
 		hurtAnimation = animM.genEntAnimation(12, hurtImage, this, 2);
 		veryHurtAnimation = animM.genEntAnimation(12, veryHurtImage, this, 2);
 		walkAnimation = animM.genEntAnimation(8, walkImage, this, 4, 2, 2);
+		punchAnimation = animM.genEntAnimation(32, punchImage, this, 8, 2, 4);
+		windupAnimation = animM.genEntAnimation(32, windupImage, this, 4, 2, 2);
 
 		inputManager = gameScreen.inputM;
 
@@ -94,8 +100,14 @@ public class EnemyRat extends Enemy {
 
 			if (grounded) { // Si estás en el suelo
 				
-				if (!hit && !moving) {
+				if (!hit && !moving && !attacking) {
 					newAnimState = AnimationState.IDLE;	
+				}
+				
+				if (attacking) {
+					dontWalk = true;
+					dontJump = true;
+					attack(deltaTime);
 				}
 				
 			}
@@ -196,9 +208,18 @@ public class EnemyRat extends Enemy {
 			break;
 			
 		case WALKING:
-			animM.drawAnimSprite(batch, walkAnimation, this, true);
+			animM.drawAnimSprite(batch, walkAnimation, this, true);	
+			break;
 			
+		case PUNCH_WINDUP:
+			animM.drawAnimSprite(batch, windupAnimation, this, false);
+			break;
+
+		case PUNCH:
+			animM.drawAnimSprite(batch, punchAnimation, this, false);
+			break;
 		}
+			
 		
 		batch.setColor(Color.WHITE);
 
@@ -217,6 +238,34 @@ public class EnemyRat extends Enemy {
 	@Override
 	public void sleep() {
 		newAnimState = AnimationState.SLEEPING;
+	}
+	
+	public void attack(float delta) {
+		
+		if (atkWindUp >= 0.3f) {
+			if (atkTimer < 0.5f) {
+				if (atkTimer == 0) {
+					System.out.println("Tuah");
+					spawnHitbox = true;
+				}
+				newAnimState = AnimationState.PUNCH;
+				atkTimer += delta;	
+			}
+		}
+		else {
+//			System.out.println("Hawk");
+			newAnimState = AnimationState.PUNCH_WINDUP;
+			atkWindUp += delta;
+		}
+		
+		if (atkTimer >= 0.5f || hit) {
+			attacking = false;
+			dontWalk = false;
+			dontJump = false;
+			atkTimer = 0f;
+			atkWindUp = 0f;
+		}
+		
 	}
 	
 	public void walkToLeft(float delta) {

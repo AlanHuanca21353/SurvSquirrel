@@ -42,13 +42,14 @@ public class Player extends Entity {
 	smackAnimation;
 
 	float shootTimer, shootDelayTimer, 
-	smackTimer, smackDelayTimer, atkStartX;
+	smackTimer, smackDelayTimer, atkStartX,
+	iFrames;
 
 	public Sound jumpSound, slingShotSound, hurtSound, 
 	deathSound, reviveSound, walkSound;
 
 	private boolean movingRight, movingLeft, moving, jumping, 
-	chargingShot, shooting, smacking, dontWalk, dontJump;
+	chargingShot, shooting, smacking, dontWalk, dontJump, invincible;
 
 	private boolean dead;
 	
@@ -110,8 +111,26 @@ public class Player extends Entity {
 	@Override
 	public void update(float deltaTime, float gravity) {
 		
+		if (invincible) {
+			if (iFrames >= 0.2f) {
+				invincible = false;
+				iFrames = 0f;
+			}
+			else {
+				iFrames += deltaTime;
+			}
+		}
+		
 		if (hp < 0) {
 			hp = 0;
+		}
+		
+//		if (moving) {
+//			System.out.println("Se ha recorrido una distancia de " +  velX + " px");
+//		}
+		
+		if (velX == 0) {
+			newAnimState = AnimationState.IDLE;
 		}
 
 		if (!dead) {
@@ -258,7 +277,7 @@ public class Player extends Entity {
 				}
 
 				this.dirX = Direcciones.LEFT;
-				if (!jumping && grounded && !smacking) {
+				if (!jumping && grounded && !smacking && velX != 0) {
 					newAnimState = AnimationState.WALKING;	
 				}
 
@@ -274,7 +293,7 @@ public class Player extends Entity {
 				}
 
 				this.dirX = Direcciones.RIGHT;
-				if (!jumping && grounded && !smacking) {
+				if (!jumping && grounded && !smacking && velX != 0) {
 					newAnimState = AnimationState.WALKING;	
 				}
 
@@ -305,8 +324,8 @@ public class Player extends Entity {
 				}
 
 				if (bigOuch) {
-					moveX(tempSpeed * 5 * deltaTime);
-					this.newAnimState = AnimationState.VERYHURT;
+					moveX(tempSpeed * 1.5f * deltaTime);
+					this.newAnimState = AnimationState.HURT;
 				} else {
 					this.newAnimState = AnimationState.HURT;
 				}
@@ -315,6 +334,7 @@ public class Player extends Entity {
 
 					ouchTimer = 0f;
 					hit = dontWalk = dontJump = bigOuch = hitLeft = hitRight = false;
+					invincible = true;
 
 					if (hp <= 0f) {
 						die();
@@ -445,6 +465,10 @@ public class Player extends Entity {
 
 	public boolean isDead() {
 		return dead;
+	}
+	
+	public boolean isInvincible() {
+		return invincible;
 	}
 	
 	public boolean canCamFollow() {
