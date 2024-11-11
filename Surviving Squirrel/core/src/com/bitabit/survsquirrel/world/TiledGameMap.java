@@ -181,7 +181,7 @@ public class TiledGameMap {
 		boolean hasPlayerSpawned = false;
 		
 		for (int row = 0; row < mapW; row++) {
-			int x = row * TileType.TILE_SIZE;
+			int x = row * TileType.TILE_SIZE - 20;
 			
 			for (int col = 0; col < mapH; col++) {
 				int y = col * TileType.TILE_SIZE;

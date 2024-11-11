@@ -239,13 +239,13 @@ public class GameScreen implements Screen, ChangeMapEvent{
 		// [Game Logic]
 		//-------------------------------------------------------------------------
 
-//		if (inputM.isKeyReleased(Input.Keys.V)) {
-//			collisionLayer.setVisible(!collisionLayer.isVisible());
-//		}
-//
-//		if (inputM.isKeyReleased(Input.Keys.E)) {
-//			entitiesLayer.setVisible(!entitiesLayer.isVisible());
-//		}
+		if (inputM.isKeyReleased(Input.Keys.V)) {
+			collisionLayer.setVisible(!collisionLayer.isVisible());
+		}
+
+		if (inputM.isKeyReleased(Input.Keys.E)) {
+			entitiesLayer.setVisible(!entitiesLayer.isVisible());
+		}
 
 
 //		if (inputM.isKeyReleased(Input.Keys.NUM_0)) { // Matar a todos los enemigos

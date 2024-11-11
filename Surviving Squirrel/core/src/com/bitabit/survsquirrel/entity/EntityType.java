@@ -4,7 +4,7 @@ public enum EntityType {
 	
 	PLAYER("player", 60, 60, 20, 20, 20, 100),
 	ENEMYRAT("rat", 60, 70, 20, 40, 20, 100),
-	BULLET("bullet", 5, 5, 18),
+	BULLET("bullet", 7, 7, 5, 5, 1, 18),
 	SQUIRRELTAIL("squirreltail", 20, 32, 0);
 	
 	private String id;

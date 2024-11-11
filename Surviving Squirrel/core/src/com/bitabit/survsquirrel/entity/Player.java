@@ -174,7 +174,7 @@ public class Player extends Entity {
 						this.dirX = Direcciones.RIGHT;
 					}
 				}
-				if (inputManager.isKeyReleased(Input.Keys.F) && shootDelayTimer >= SHOOT_WAIT_TIME && !moving){ // Disparar
+				if (inputManager.isKeyReleased(Input.Keys.F) && shootDelayTimer >= SHOOT_WAIT_TIME && !moving && !smacking){ // Disparar
 
 					shootDelayTimer = 0f;
 
@@ -203,7 +203,7 @@ public class Player extends Entity {
 				}
 			}
 			
-			if (inputManager.isKeyPressed(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME) {
+			if (inputManager.isKeyPressed(Input.Keys.G) && smackDelayTimer >= SMACK_WAIT_TIME && !chargingShot) {
 				smackDelayTimer = 0f;
 				
 				audioM.playSound(slingShotSound, 0.6f, 0.5f, 0.7f);

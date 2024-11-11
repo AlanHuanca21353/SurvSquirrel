@@ -1,7 +1,9 @@
 package com.bitabit.survsquirrel.entity.attack;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.bitabit.survsquirrel.entity.Entity;
 import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.entity.Player;
@@ -16,6 +18,8 @@ public class Bullet extends Attack {
 	private Direcciones dirX;
 	
 	public boolean hurtPlayer = false;
+	
+	Animation<TextureRegion> bulletAnim;
 
 	public Bullet(float x, float y, GameScreen gameScreen, float power, Direcciones dirX) {
 		super(x, y, EntityType.BULLET, gameScreen, power);
@@ -23,6 +27,9 @@ public class Bullet extends Attack {
 		this.dirX = dirX;
 		
 		bImg = new Texture("imagenes/bullet.png");
+		
+		bulletAnim = animM.genEntAnimation(12, bImg, this, 4, 2, 2);
+		
 
 
 	}
@@ -60,8 +67,7 @@ public class Bullet extends Attack {
 
 	public void update(float deltaTime, float gravity) {
 		this.velocityY += getWeight() * deltaTime;
-
-
+		
 		switch (getDirX()) {
 		case RIGHT:
 			moveX(getSpeed() * deltaTime * (getPower()/2)+1);
@@ -73,11 +79,17 @@ public class Bullet extends Attack {
 		}
 
 		super.update(deltaTime, gravity);
+		
+		if (velX == 0) {
+			remove = true;
+		}
 	}
 
 	@Override
 	public void render(SpriteBatch batch) {
-		animM.drawStaticSprite(batch, bImg, this);
+//		animM.drawStaticSprite(batch, bImg, this);
+		
+		animM.drawAnimSprite(batch, bulletAnim, this, true);
 
 	}
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -26,6 +27,8 @@ public class MainMenuScreen implements Screen{
 	
 	private Texture gameTitle;
 	
+	private Sprite bgSprite;
+	
 	private Texture playButtonActive;
 	private Texture playButtonInactive;
 	
@@ -41,6 +44,10 @@ public class MainMenuScreen implements Screen{
 		screenViewport = pr.screenViewport;
 		
 		gameTitle = new Texture("imagenes/title.png");
+		
+		bgSprite = new Sprite(bg);
+		
+		
 		
 		playButtonActive = new Texture("imagenes/play_button_active.png");
 		playButtonInactive = new Texture("imagenes/play_button_inactive.png");
@@ -72,7 +79,7 @@ public class MainMenuScreen implements Screen{
 		
 		pr.batch.begin();
 		
-		pr.batch.draw(bg, Gdx.graphics.getWidth()/2-640, Gdx.graphics.getHeight()/2-360, 1280, 720);
+		bgSprite.draw(pr.batch);
 		
 		int exitX = Gdx.graphics.getWidth()/2 - EXIT_BUTTON_WIDTH/2;
 		int exitY = EXIT_BUTTON_Y;
@@ -111,6 +118,10 @@ public class MainMenuScreen implements Screen{
 	@Override
 	public void resize(int width, int height) {
 		screenViewport.update(width, height, true);
+		
+		bgSprite.setSize(width, height);
+		
+		System.out.println("Hola");
 		
 	}
 
