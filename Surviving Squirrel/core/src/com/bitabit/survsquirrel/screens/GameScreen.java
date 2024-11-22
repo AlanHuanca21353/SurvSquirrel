@@ -174,6 +174,11 @@ public class GameScreen implements Screen, ChangeMapEvent{
 			this.dispose();
 		}
 		
+		if (ratCount == 0) {
+			pr.setScreen(new WinScreen(pr));
+			this.dispose();
+		}
+		
 		// TODO Auto-generated method stub
 
 		// debugDetectarTile();
