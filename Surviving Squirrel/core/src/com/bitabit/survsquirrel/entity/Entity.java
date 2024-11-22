@@ -8,7 +8,6 @@ import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
 import com.bitabit.survsquirrel.tools.AnimationMethods;
 import com.bitabit.survsquirrel.tools.AudioMethods;
-import com.bitabit.survsquirrel.tools.RandomGenerator;
 import com.bitabit.survsquirrel.world.TileType;
 
 public abstract class Entity {
@@ -41,8 +40,6 @@ public abstract class Entity {
 	public AudioMethods audioM = new AudioMethods();
 	public AnimationMethods animM = new AnimationMethods();
 
-	protected RandomGenerator rg;
-
 	protected float animTime;
 	
 	public float atkStartX;
@@ -51,8 +48,6 @@ public abstract class Entity {
 		this.pos = new Vector2(x,y);
 		this.type = type;
 		this.gameScreen = gameScreen;
-
-		rg = gameScreen.rg;
 
 	}
 

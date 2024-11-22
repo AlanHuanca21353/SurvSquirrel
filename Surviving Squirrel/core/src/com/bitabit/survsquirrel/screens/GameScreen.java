@@ -31,7 +31,6 @@ import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.events.ChangeMapEvent;
 import com.bitabit.survsquirrel.events.Listeners;
 import com.bitabit.survsquirrel.hud.GameHud;
-import com.bitabit.survsquirrel.tools.RandomGenerator;
 //import com.bitabit.survsquirrel.Rebotante;
 import com.bitabit.survsquirrel.world.TileType;
 import com.bitabit.survsquirrel.world.TiledGameMap;
@@ -52,8 +51,6 @@ public class GameScreen implements Screen, ChangeMapEvent{
 	private static final int MAP_LEFTBOUNDARY = 320;
 
 	OrthographicCamera cam;
-
-	public RandomGenerator rg = new RandomGenerator();
 
 	public SpriteBatch batch;
 	public InputManager inputM;
@@ -272,6 +269,16 @@ public class GameScreen implements Screen, ChangeMapEvent{
 			tint.set(Color.WHITE);
 
 		}
+		
+//		if (inputM.isKeyReleased(Input.Keys.NUM_2)) { // Mapa 2
+//			
+//			ratCount = 20;
+//			
+//			Listeners.executeMapChange(2);
+//			
+//			tint.set(0.5f, 0.5f, 1f, 1f);
+//
+//		}
 
 //		if (inputM.isKeyReleased(Input.Keys.NUM_5)) { // Spawnear Rata
 //			enemies.add(new EnemyRat(p.getX()+70, p.getY()+100, this));
@@ -342,12 +349,6 @@ public class GameScreen implements Screen, ChangeMapEvent{
 					}
 					
 //					System.out.println(er.isMoving());
-					
-					if (p.getPos().y > e.getPos().y) {
-						if (rg.genRandomInt(1, 100) == 1) {
-							er.jump();
-						}
-					}
 					
 					if (er.isMoving()){
 						if (er.getVelX() == 0) {

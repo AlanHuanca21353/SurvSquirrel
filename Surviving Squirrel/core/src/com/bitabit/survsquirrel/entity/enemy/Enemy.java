@@ -9,7 +9,6 @@ import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.enums.AnimationState;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
-import com.bitabit.survsquirrel.tools.RandomGenerator;
 
 public abstract class Enemy extends Entity {
 	

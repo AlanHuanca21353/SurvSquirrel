@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 
 public class AudioMethods {
-	
-	private RandomGenerator rg = new RandomGenerator();
 
 	/** Crea un Efecto de Sonido nuevo.
 	 * @param path - La ruta del archivo a utilizar (puede ser ogg, wav, mp3, etc)
@@ -50,7 +48,7 @@ public class AudioMethods {
 	public void playSound(Sound sound, float volume, float minPitch, float maxPitch) {
 		
 		long id = sound.play(volume);
-		sound.setPitch(id, rg.genRandomFloat(minPitch, maxPitch));
+		sound.setPitch(id, 1);
 		
 	}
 	

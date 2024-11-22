@@ -14,14 +14,11 @@ import com.bitabit.survsquirrel.entity.EntityType;
 import com.bitabit.survsquirrel.enums.AnimationState;
 import com.bitabit.survsquirrel.enums.Direcciones;
 import com.bitabit.survsquirrel.screens.GameScreen;
-import com.bitabit.survsquirrel.tools.RandomGenerator;
 
 public class EnemyRat extends Enemy {
 
 	private static final int SPEED = 90;
 	private static final int JUMP_VELOCITY = 4;
-
-	RandomGenerator rg;
 
 	InputManager inputManager;
 
@@ -43,8 +40,6 @@ public class EnemyRat extends Enemy {
 
 	public EnemyRat(float x, float y, GameScreen gameScreen) {
 		super(x, y, EntityType.ENEMYRAT, gameScreen);
-
-		rg = gameScreen.rg;
 
 		idleImage = new Texture("imagenes/rat/rat.png");
 		hurtImage = new Texture("imagenes/rat/rat_ouch.png");
