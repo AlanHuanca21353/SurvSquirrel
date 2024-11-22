@@ -129,7 +129,7 @@ public class Player extends Entity {
 //			System.out.println("Se ha recorrido una distancia de " +  velX + " px");
 //		}
 		
-		if (velX == 0) {
+		if (velX == 0 && grounded) {
 			newAnimState = AnimationState.IDLE;
 		}
 
@@ -140,11 +140,11 @@ public class Player extends Entity {
 			//		System.out.println(animTime);
 
 			if (!dontJump) {
-				if (inputManager.isKeyDown(Input.Keys.SPACE) || inputManager.isKeyDown(Input.Keys.W) && !dontJump) {
+				if (inputManager.isKeyDown(Input.Keys.SPACE) || inputManager.isKeyDown(Input.Keys.W) && !dontJump && !inputManager.isKeyPressed(Input.Keys.F)) {
 					jumping = true;
 				}
 
-				if (inputManager.isKeyReleased(Input.Keys.SPACE) || inputManager.isKeyReleased(Input.Keys.W) && !dontJump) {
+				if (inputManager.isKeyReleased(Input.Keys.SPACE) || inputManager.isKeyReleased(Input.Keys.W) && !dontJump && !inputManager.isKeyPressed(Input.Keys.F)) {
 					jumping = false;
 				}	
 			}
@@ -184,7 +184,7 @@ public class Player extends Entity {
 					shooting = true;
 				}
 
-				if (jumping) { // Salto inicial
+				if (jumping && !chargingShot && !shooting) { // Salto inicial
 					this.velocityY += JUMP_VELOCITY * getWeight();
 
 					audioM.playSound(jumpSound, 0.5f, 0.9f, 1.1f);
@@ -214,13 +214,13 @@ public class Player extends Entity {
 
 			if (!dontWalk) { // Si se permite caminar
 
-				if (inputManager.isKeyDown(Input.Keys.A)) {
+				if (inputManager.isKeyDown(Input.Keys.A) && !inputManager.isKeyPressed(Input.Keys.F)) {
 					movingLeft = true;
 				} 
 				if (inputManager.isKeyReleased(Input.Keys.A)) {
 					movingLeft = false;
 				}
-				if (inputManager.isKeyDown(Input.Keys.D)) {
+				if (inputManager.isKeyDown(Input.Keys.D) && !inputManager.isKeyPressed(Input.Keys.F)) {
 					movingRight = true;
 				}
 				if (inputManager.isKeyReleased(Input.Keys.D)) {
@@ -232,7 +232,7 @@ public class Player extends Entity {
 				newAnimState = AnimationState.FALLING;
 			}
 
-			if (chargingShot && !jumping) {
+			if (chargingShot && !jumping && !moving) {
 				// Está cargando el disparo
 				newAnimState = AnimationState.CHARGESHOT;
 				dontWalk = true;
@@ -268,7 +268,10 @@ public class Player extends Entity {
 			}
 
 			// Mover
-			if (movingLeft && !hit) { // Mover Izquierda
+			if (movingLeft && !hit && !chargingShot) { // Mover Izquierda
+				
+				
+				
 				if (inputManager.isKeyDown(Input.Keys.SHIFT_LEFT)) {
 					moveX(-RUN_SPEED * deltaTime * speedMultiplier);
 				}
@@ -284,7 +287,7 @@ public class Player extends Entity {
 
 			}
 
-			if (movingRight && !hit) { // Mover Derecha
+			if (movingRight && !hit && !chargingShot) { // Mover Derecha
 				if (inputManager.isKeyDown(Input.Keys.SHIFT_LEFT)) {
 					moveX(RUN_SPEED * deltaTime * speedMultiplier);
 				}
